@@ -1,22 +1,12 @@
-//freecodecamp  Working with Headers https://www.freecodecamp.org/news/javascript-fetch-api-tutorial-with-js-fetch-post-and-header-examples/
-    /*
-function requestGet(){ 
-    fetch('http://localhost:3000/api/products'{
-        method: 'GET',       // for a GET request, we just write fetch(URL).then???? 
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(function(response){
-        return response.json();
-    })
-    .then(function(json){
-        console.log(json)
-    });
-    .catch(function(err){
-        console.log(err)
-    });
+// from the course bloc3-3fr
+/*async function getPostRequests(){
+    getResults = await Promise.all([get(URL1), get(URL2)]);
+    const postResult = await post(URL3);
+    return [getResults, postResult];          //get post両方の結果待ってから返す 
 }
+getPostRequests().then(function(allResults){
+    //do sth with the results
+});
 */
 
 //send POST request via Ajax bloc2-4fr all shoud be inside a -> 
@@ -43,15 +33,61 @@ function send(event){
 }
 //document.getElementById('').addEventListener('submit',send);
 
-// from the course bloc3-3fr
-/*async function getPostRequests(){
-    getResults = await Promise.all([get(URL1), get(URL2)]);
-    const postResult = await post(URL3);
-    return [getResults, postResult];          //get post両方の結果待ってから返す 
+//Etape3: page d'accueil, inserer produits
+//freecodecamp  Working with Headers https://www.freecodecamp.org/news/javascript-fetch-api-tutorial-with-js-fetch-post-and-header-examples/
+    /*
+function requestGet(){ 
+    fetch('http://localhost:3000/api/products'{
+        method: 'GET',       // for a GET request, we just write fetch(URL).then???? 
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(function(response){
+        return response.json();
+    })
+    .then(function(json){
+        console.log(json)
+    });
+    .catch(function(err){
+        console.log(err)
+    });
 }
-getPostRequests().then(function(allResults){
-    //do sth with the results
-});
 */
 
+function requestGet(){ 
+    fetch('http://localhost:3000/api/products'  /*{
+        method: 'GET',       // for a GET request, we just write fetch(URL).then???? 
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(function(response){
+        return response.json();
+    }*/)    
+    .then(function(value){
+        const products = [];
+        for (let product of products) {
+            const productImage = document.createElement('img');
+                productImage.textContent = img;
+                productImage.setAttribute('src', product.imageUrl);
+                productImage.setAttribute('alt', product.altTxt);
+            const productName = document.createElement('h3');
+                productName.innerHTML = product.name;   //GETjsonになんて書かれてるか。。
+                productName.classList.add('productName');
+            const productDescription = document.createElement('p');
+                productDescription.innerHTML = product.description,   //GETjsonになんて書かれてるか。。
+                productDescription.classList.add('productDescription');
 
+            const newItem = document.createElement('article');
+            newItem.appendChild('productImage');
+            newItem.appendChild('productName');
+            newItem.appendChild('productDescription');
+            //newItemのカードをセクションItemsに最後子要素として挿入する
+            document.getElementById('items').appendChild('newItem');
+        }
+    });
+/*    .catch(function(err){
+        console.log('get request error occured');
+    });  */
+}
