@@ -61,30 +61,36 @@ function requestGet(){
         headers: {
             'Content-Type': 'application/json'
         }
-    })
+    })*/)
     .then(function(response){
+        if(response.ok){
         return response.json();
-    }*/)    
-    .then(function(value){
-        const products = [];
+        }
+    })    
+    .then(function(){
+        const products = [response.json];  //localhost product list should be the array...the URL
         for (let product of products) {
             const productImage = document.createElement('img');
                 productImage.textContent = img;
                 productImage.setAttribute('src', product.imageUrl);
                 productImage.setAttribute('alt', product.altTxt);
             const productName = document.createElement('h3');
-                productName.innerHTML = product.name;   //GETjsonになんて書かれてるか。。
+                productName.innerHTML = product.name; 
                 productName.classList.add('productName');
             const productDescription = document.createElement('p');
-                productDescription.innerHTML = product.description,   //GETjsonになんて書かれてるか。。
+                productDescription.innerHTML = product.description;
                 productDescription.classList.add('productDescription');
 
             const newItem = document.createElement('article');
             newItem.appendChild('productImage');
             newItem.appendChild('productName');
             newItem.appendChild('productDescription');
-            //newItemのカードをセクションItemsに最後子要素として挿入する
-            document.getElementById('items').appendChild('newItem');
+/*          const newItemLink = document.createElement('a');
+            newItemLink.setAttribute('href', objectURL????);
+            newItemLink.appendChild('newItem');
+*/
+            //newItemのカードをセクションItemsに最後子要素として挿入する with link-> newItemLink
+            document.getElementById('items').appendChild('newItem'); 
         }
     });
 /*    .catch(function(err){
