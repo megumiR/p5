@@ -31,7 +31,7 @@ function send(event){
     //        return thrrow new Error;
     //    });
 }
-//document.getElementById('').addEventListener('submit',send);
+//document.getElementByTagName('article').addEventListener('click',send); アイテムのリンクをクリックしたらプロダクトページに飛ぶ。
 
 //Etape3: page d'accueil, inserer produits
 //freecodecamp  Working with Headers https://www.freecodecamp.org/news/javascript-fetch-api-tutorial-with-js-fetch-post-and-header-examples/
@@ -97,3 +97,5 @@ function requestGet(){
         console.log('get request error occured');
     });  */
 }
+
+document.getElementByTagName('article').addEventListener('click',send);
