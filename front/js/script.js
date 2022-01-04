@@ -54,6 +54,7 @@ function send(event){
                 if(params.has('id')){
                     var itemId = params.get('id');
                     console.log(itemId)
+                    //send the choice to product page??
                 }
                 
             
@@ -99,8 +100,8 @@ function requestGet(){
         return response.json();
         }
     })    
-    .then(function(event){
-        event.preventDefault();
+    .then(function(){
+        
         const products = [response.json];  //localhost product list should be the array...the URL
         for (let product of products) {
             const productImage = document.createElement('img');
