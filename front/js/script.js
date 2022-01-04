@@ -1,3 +1,24 @@
+//resourse webiner ${article.id}--23:40 , 
+/*fetch('http://localhost:3000/api/products')
+    .then(function(data){
+        return data.json();
+    })
+    .then(function(jsonListArticle){
+        for (let jsonArticle of jsonListArticle){
+            let article = new Article(jsonArticle); 
+     //je dois creer un fichier article.js?????class article constructor...webinar 24:22
+        document.querySelector('.items').innerHTML += 
+          `<a href="./product.html?id=${article.id}">
+            <article>
+              <img src=".../product01.jpg" alt="Lorem ipsum dolor sit amet, Kanap name1">
+              <h3 class="productName">Kanap name1</h3>
+              <p class="productDescription">Dis enim malesuada risus sapien gravida nulla nisl arcu. Dis enim malesuada risus sapien gravida nulla nisl arcu.</p>
+            </article>
+          </a>` ;
+        }
+        console.log(jsonListArticle);
+    });
+*/
 // from the course bloc3-3fr
 /*async function getPostRequests(){
     getResults = await Promise.all([get(URL1), get(URL2)]);
@@ -26,11 +47,21 @@ function send(event){
         })
         .then(function(value){
             //like return the result as a innerText = value.postData.text: >>check postData.text 
+            //we wanna put the result in a product page =by post, send the id and get at product page??(etape4)
+            //console.log('post request works ')
+                var url = new URL('http://localhost:3000/api/products');  //表示Urlを取得。
+                var params = url.searchParams; //Urlについてるパラメータを取得。パラがあったらのIf文
+                if(params.has('id')){
+                    var itemId = params.get('id');
+                    console.log(itemId)
+                }
+                
+            
+        })   
+        .catch(function(err){
+            console.log('error occurd')
         });
-    //    .catch(function(err){
-    //        return thrrow new Error;
-    //    });
-}
+/*}
 //document.getElementByTagName('article').addEventListener('click',send); アイテムのリンクをクリックしたらプロダクトページに飛ぶ。
 
 //Etape3: page d'accueil, inserer produits
@@ -55,19 +86,21 @@ function requestGet(){
 }
 */
 
+
 function requestGet(){ 
     fetch('http://localhost:3000/api/products'  /*{
         method: 'GET',       // for a GET request, we just write fetch(URL).then???? 
         headers: {
             'Content-Type': 'application/json'
         }
-    })*/)
+    }))*/
     .then(function(response){
         if(response.ok){
         return response.json();
         }
     })    
-    .then(function(){
+    .then(function(event){
+        event.preventDefault();
         const products = [response.json];  //localhost product list should be the array...the URL
         for (let product of products) {
             const productImage = document.createElement('img');
@@ -85,17 +118,20 @@ function requestGet(){
             newItem.appendChild('productImage');
             newItem.appendChild('productName');
             newItem.appendChild('productDescription');
-/*          const newItemLink = document.createElement('a');
-            newItemLink.setAttribute('href', objectURL????);
+/*Etape4?    const newItemLink = document.createElement('a');
+            const eactLinkWithId = './product.html?id=' + product.id;
+            newItemLink.setAttribute('href', eactLinkWithId);
             newItemLink.appendChild('newItem');
 */
             //newItemのカードをセクションItemsに最後子要素として挿入する with link-> newItemLink
             document.getElementById('items').appendChild('newItem'); 
         }
-    });
+    }));
 /*    .catch(function(err){
         console.log('get request error occured');
     });  */
 }
+
+
 
 document.getElementByTagName('article').addEventListener('click',send);
