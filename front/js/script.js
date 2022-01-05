@@ -30,41 +30,6 @@ getPostRequests().then(function(allResults){
 });
 */
 
-//send POST request via Ajax bloc2-4fr all shoud be inside a -> 
-function send(event){
-    fetch('http://localhost:3000/api/products', {
-        method: 'POST',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(jsonBody)//({value: document.getElementById('').value})POSTで返された値をどこに置くか
-    })
-        .then(function(response){
-            if(response.ok){
-                return response.json();    //response.text()  + .then(function(text){ Element.innerText = text; });...MDN
-            }
-        })
-        .then(function(value){
-            //like return the result as a innerText = value.postData.text: >>check postData.text 
-            //we wanna put the result in a product page =by post, send the id and get at product page??(etape4)
-            //console.log('post request works ')
-                var url = new URL('http://localhost:3000/api/products');  //表示Urlを取得。
-                var params = url.searchParams; //Urlについてるパラメータを取得。パラがあったらのIf文
-                if(params.has('id')){
-                    var itemId = params.get('id');
-                    console.log(itemId)
-                    //send the choice to product page??
-                }
-                
-            
-        })   
-        .catch(function(err){
-            console.log('error occurd')
-        });
-/*}
-//document.getElementByTagName('article').addEventListener('click',send); アイテムのリンクをクリックしたらプロダクトページに飛ぶ。
-
 //Etape3: page d'accueil, inserer produits
 //freecodecamp  Working with Headers https://www.freecodecamp.org/news/javascript-fetch-api-tutorial-with-js-fetch-post-and-header-examples/
     /*
@@ -88,7 +53,7 @@ function requestGet(){
 */
 
 
-function requestGet(){ 
+//function requestGet(){ 
     fetch('http://localhost:3000/api/products',{
         method: 'GET',       // for a GET request, we just write fetch(URL).then???? 
         headers: {
@@ -133,8 +98,39 @@ function requestGet(){
     .catch(function(err){
         console.log('get request error occured');
     });  
+//}
+
+
+//send POST request via Ajax bloc2-4fr all shoud be inside a -> 
+/*function send(event){
+    fetch('http://localhost:3000/api/products', {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(jsonBody) //({value: document.getElementById('').value})POSTで返された値をどこに置くか
+    })
+        .then(function(response){
+            if(response.ok){
+                return response.json();    //response.text()  + .then(function(text){ Element.innerText = text; });...MDN
+            }
+        })
+        .then(function(value){
+            //like return the result as a innerText = value.postData.text: >>check postData.text 
+            //we wanna put the result in a product page =by post, send the id and get at product page??(etape4)
+            //console.log('post request works ')
+                var url = new URL('http://localhost:3000/api/products');  //表示Urlを取得。
+                var params = new URLSearchParams(url.search); //Urlについてるパラメータを取得。パラがあったらのIf文
+                if(params.has('_id')){
+                    var itemId = params.get('_id');
+                    console.log(itemId)
+                    //send the choice to product page??
+                }
+        })   
+        .catch(function(err){
+            console.log('error occurd')
+        });
 }
-
-
-
-document.getElementByTagName('article').addEventListener('click',send);
+// once we click the item link, move to product.html??
+document.querySelector('article').addEventListener('click',send); */
