@@ -9,20 +9,17 @@
                 }  */
     
     var search_params = new URLSearchParams(document.location.search); //document.location.search = URL de cette page
-    var itemId = url.searchParams.get('_id');
+    var itemId = search_params.get('id');  //id OR _id -> follow the one you can see <a href>on inspector google
     /*var itemName = url.searchParams.get('name');
-    var itemImgsrc = url.searchParams.get('imageUrl');
-    var itemAltTxt = url.searchParams.get('altTxt');
-    var itemPrice = url.searchParams.get('price');
-    var itemDescription = url.searchParams.get('description');
-*/
+    var itemImgsrc = url.searchParams.get('imageUrl');  */
     /*for (var value of searchParams.values()){
         console.log(value);
     }*/
     console.log(itemId);
 //etape6 une seule article affiche, get request takes specific id's info
-//get--parametre:{product-ID}
-fetch('http://localhost:3000/api/products', {
+//get--parametre:/{product-ID}  =fetch('http..../' + {product-ID} )
+let url = 'http://localhost:3000/api/products/' + itemId;
+fetch(url, {
     method: 'GET',                                  
         headers: {
             'Accept': 'application/json',
@@ -34,22 +31,60 @@ fetch('http://localhost:3000/api/products', {
         return response.json();
         }
     }) 
-    .then(function(itemId){  // .then(function(url.searchParams.get('_id')){
+    .then(function(product){  // Search_Params.get('_id')のデータGETした上で、返ってくる１商品のProductInfoを使ってく
         //etape6 return l'element correspondant a {product-ID}　何番目のデータか確認して名前つけたらproduct.nameみたいに引っ張れる？
-        document.getElementById('title').innerHTML =  url.searchParams.get('name');  //itemName
-        document.getElementById('price').innerHTML = itemId.price;  //itemPrice
-        document.getElementById('description').textContent = itemId.description;  //itemDescription  
+        document.getElementById('title').innerHTML = product.name;  //itemName
+        document.getElementById('price').innerHTML = product.price;  //itemPrice
+        document.getElementById('description').textContent = product.description;   
 
         let imgDiv = document.createElement('img');
-            imgDiv.setAttribute('src', itemId.imageUrl);  //itemImgsrc
-            imgDiv.setAttribute('alt', itemId.altTxt);  //itemAltTxt
+            imgDiv.setAttribute('src', product.imageUrl);  
+            imgDiv.setAttribute('alt', product.altTxt); 
             document.querySelector('.item__img').appendChild(imgDiv); 
-        for (let option of itemId.option){
+        for (let color of product.colors){
+            console.log(color);
             let colorOption = document.createElement('option');
-            colorOption.setAttribute('value', option);
+            colorOption.setAttribute('value', color);
+            colorOption.innerHTML = color;    //dont forget to show on screen as a string
             document.getElementById('colors').appendChild(colorOption);
         }
     })
     .catch(function(err){
         console.log(err)
     });
+
+    //etape7 store info(color,quantity,) in a localstorage 
+
+    /* if ( color && id == same product) ++; eventListener('click', ) store []; in localstorage
+    */
+let cart = [];
+cart.push(['ID', 'QUANTITY', 'COLOR']);  // .push(); ->define what you wanna put in the array
+   /* this push look like this..
+   [//cart
+    ['123456', 50, 'red'], //product
+    ['123456', 100, 'white'], //product with different color variation = same ID but color, quantity different
+    []
+   ]
+   */
+// verifier si 'cart' n'est pas 'null' ??????
+let colorChosen = document.querySelector('option').value; //ne peux pas recuperer la valeur choisi
+let quantityChosen = document.getElementById('quantity').value; //recuperer??
+let isProductInCart = false; 
+if(cart){
+    for (let product of cart){  ///product of cart ???????????     
+        if(cart[0] == itemId && cart[2] == colorChosen){
+            cart[1] += quantityChosen;
+            let isProductInCart = true; 
+        } 
+    }
+} else {
+    cart = [];
+}
+if(!isProductInCart){
+    cart.push = [itemId, colorChosen, quantityChosen];
+}
+document.getElementById('addToCart').addEventListener('click', function(){
+    console.log(cart);
+    localStorage.setItem('cart', cart);
+})
+//    localStorage.getItem('ID'); //page panier?

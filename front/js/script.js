@@ -82,21 +82,21 @@ function requestGet(){
                 productDescription.classList.add('productDescription');
 
             let newItem = document.createElement('article');
-            newItem.appendChild('productImage');
-            newItem.appendChild('productName');
-            newItem.appendChild('productDescription');
+            newItem.appendChild(productImage);
+            newItem.appendChild(productName);
+            newItem.appendChild(productDescription);
 //Etape4 creer un lien
             let newItemLink = document.createElement('a');
             let eachLinkWithId = './product.html?id=' + product._id;
             newItemLink.setAttribute('href', eachLinkWithId);
-            newItemLink.appendChild('newItem');
+            newItemLink.appendChild(newItem);
 
             //newItemのカードをセクションItemsに最後子要素として挿入する newItem--> with link: newItemLink
-            document.getElementById('items').appendChild('newItemLink'); 
+            document.getElementById('items').appendChild(newItemLink); 
         }
     })
     .catch(function(err){
-        console.log('get request error occured');
+        console.log(err);
     });  
 //}
 
