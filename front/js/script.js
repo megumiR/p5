@@ -89,48 +89,50 @@ function requestGet(){
 
 
 function requestGet(){ 
-    fetch('http://localhost:3000/api/products'  /*{
+    fetch('http://localhost:3000/api/products',{
         method: 'GET',       // for a GET request, we just write fetch(URL).then???? 
         headers: {
+            'Accept': 'application/json',
             'Content-Type': 'application/json'
         }
-    }))*/
+    })
     .then(function(response){
         if(response.ok){
         return response.json();
         }
     })    
-    .then(function(){
-        
-        const products = [response.json];  //localhost product list should be the array...the URL
+    .then(function(products){  //le parametre entre() est le resultat de l'appel API = products 
+       // const products = [response.json];  localhost product list should be the array...the URL
         for (let product of products) {
-            const productImage = document.createElement('img');
-                productImage.textContent = img;
+            //let OR const? -> image changes every time so let is better 
+            let productImage = document.createElement('img');
+               // productImage.textContent = img;  n'a pas besoin?
                 productImage.setAttribute('src', product.imageUrl);
                 productImage.setAttribute('alt', product.altTxt);
-            const productName = document.createElement('h3');
+            let productName = document.createElement('h3');
                 productName.innerHTML = product.name; 
                 productName.classList.add('productName');
-            const productDescription = document.createElement('p');
+            let productDescription = document.createElement('p');
                 productDescription.innerHTML = product.description;
                 productDescription.classList.add('productDescription');
 
-            const newItem = document.createElement('article');
+            let newItem = document.createElement('article');
             newItem.appendChild('productImage');
             newItem.appendChild('productName');
             newItem.appendChild('productDescription');
-/*Etape4?    const newItemLink = document.createElement('a');
-            const eactLinkWithId = './product.html?id=' + product.id;
-            newItemLink.setAttribute('href', eactLinkWithId);
+//Etape4 creer un lien
+            let newItemLink = document.createElement('a');
+            let eachLinkWithId = './product.html?id=' + product._id;
+            newItemLink.setAttribute('href', eachLinkWithId);
             newItemLink.appendChild('newItem');
-*/
-            //newItemのカードをセクションItemsに最後子要素として挿入する with link-> newItemLink
-            document.getElementById('items').appendChild('newItem'); 
+
+            //newItemのカードをセクションItemsに最後子要素として挿入する newItem--> with link: newItemLink
+            document.getElementById('items').appendChild('newItemLink'); 
         }
-    }));
-/*    .catch(function(err){
+    })
+    .catch(function(err){
         console.log('get request error occured');
-    });  */
+    });  
 }
 
 
