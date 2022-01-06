@@ -10,8 +10,10 @@
     
     var search_params = new URLSearchParams(document.location.search); //document.location.search = URL de cette page
     var itemId = search_params.get('id');  //id OR _id -> follow the one you can see <a href>on inspector google
-    /*var itemName = url.searchParams.get('name');
-    var itemImgsrc = url.searchParams.get('imageUrl');  */
+    var itemName = search_params.get('name');
+    var itemImgUrl = search_params.get('imageUrl');  
+    var itemAltTxt = search_params.get('altTxt');  
+    var itemPrice = search_params.get('price');  
     /*for (var value of searchParams.values()){
         console.log(value);
     }*/
@@ -58,7 +60,7 @@ fetch(url, {
     /* if ( color && id == same product) ++; eventListener('click', ) store []; in localstorage
     */
 let cart = [];
-cart.push(['ID', 'QUANTITY', 'COLOR']);  // .push(); ->define what you wanna put in the array
+cart.push(['ID', 'QUANTITY', 'COLOR','IMGURL','ALTTXT','NAME','PRICE']);  // .push(); ->define what you wanna put in the array
    /* this push look like this..
    [//cart
     ['123456', 50, 'red'], //product
@@ -71,9 +73,9 @@ let colorChosen = document.querySelector('option').value; //ne peux pas recupere
 let quantityChosen = document.getElementById('quantity').value; //recuperer??
 let isProductInCart = false; 
 if(cart){
-    for (let product of cart){  ///product of cart ???????????     
-        if(cart[0] == itemId && cart[2] == colorChosen){
-            cart[1] += quantityChosen;
+    for (let product of cart){       
+        if(cart[0] == product.itemId && cart[2] == product.colorChosen){  // if(cart[0] == itemId && cart[2] == colorChosen){
+            cart[1] += product.quantityChosen;   //cart[1] += quantityChosen;
             let isProductInCart = true; 
         } 
     }
@@ -81,10 +83,10 @@ if(cart){
     cart = [];
 }
 if(!isProductInCart){
-    cart.push = [itemId, colorChosen, quantityChosen];
+    cart.push = [itemId, quantityChosen, colorChosen, itemImgUrl, itemAltTxt, itemName, itemPrice];
 }
 document.getElementById('addToCart').addEventListener('click', function(){
+    localStorage.setItem('cart', cart); //('cart', JSON.stringify(cart)); var array = JSON.parse( localStorage.getItem('cart') );
     console.log(cart);
-    localStorage.setItem('cart', cart);
 })
 //    localStorage.getItem('ID'); //page panier?
