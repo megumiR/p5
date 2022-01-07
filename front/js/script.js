@@ -129,7 +129,7 @@ function requestGet(){
                 }
         })   
         .catch(function(err){
-            console.log('error occurd')
+            console.log(err)
         });
 }
 // once we click the item link, move to product.html??
