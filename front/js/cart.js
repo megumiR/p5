@@ -156,7 +156,7 @@ let errMsg = [];*/
 //for(let i in ?????????){
 document.querySelector('#firstName').addEventListener('input', function(event){
 //document.querySelector(champ[i]).addEventListener('input', function(event){
-    if(checkName.match(event.target.value) == false){  // boolean false = null = form is invalid
+    if(checkName.match(event.target.value) == false){  // boolean false = null = form is invalid .MATCH OR .TEST
     //if(formCheckList[i].match(value) == false){     
         document.getElementById('firstNameErrorMsg').innerHTML = 'Le prénom est invalide. Ce champ ne reçoit que des caractères.';
     } else {
@@ -189,7 +189,7 @@ document.querySelector('#email').addEventListener('input', function(event){
 
 document.querySelector('#order').addEventListener('click', function(event){
     event.preventDefault();
-    if(document.querySelector(form p).value == null ){ //All of input are valid = function 'sendForminfo' IF NOT errMsg / alert
+    if(){ //All of input are valid = function 'sendForminfo' IF NOT errMsg / alert
         sendForminfo();
     } else {
         alert("Il y a d'info manqué!");

@@ -10,14 +10,14 @@
     
     var search_params = new URLSearchParams(document.location.search); //document.location.search = URL de cette page
     var itemId = search_params.get('id');  //id OR _id -> follow the one you can see <a href>on inspector google
-    var itemName = search_params.get('name');
-    var itemImgUrl = search_params.get('imageUrl');  
-    var itemAltTxt = search_params.get('altTxt');  
-    var itemPrice = search_params.get('price');  
-    /*for (var value of searchParams.values()){
-        console.log(value);
+    var itemName = search_params.get('name');          //its not working here
+    var itemImgUrl = search_params.get('imageUrl');   //its not working here
+    var itemAltTxt = search_params.get('altTxt');     //its not working here
+    var itemPrice = search_params.get('price');       //its not working here
+  /*  for (var value of search_params.values()){
+        console.log(value);                            ->same as a sonsole.log(itemId);
     }*/
-    console.log(itemId);
+    console.log(itemId,itemName,itemImgUrl);
 //etape6 une seule article affiche, get request takes specific id's info
 //get--parametre:/{product-ID}  =fetch('http..../' + {product-ID} )
 let url = 'http://localhost:3000/api/products/' + itemId;
@@ -59,9 +59,10 @@ fetch(url, {
 
     /* if ( color && id == same product) ++; eventListener('click', ) store []; in localstorage
     */
-let cart = [];
-cart.push(['ID', 'QUANTITY', 'COLOR','IMGURL','ALTTXT','NAME','PRICE']);  // .push(); ->define what you wanna put in the array
-   /* this push look like this..
+// avant modif-> let cart = []; apres (et mettre dans eventListener->let cart = localStorage.getItem('cart');
+/*EX:Ne pas faire de push car elles vont etre stockees dans le cart) 
+      cart.push(['ID', 'QUANTITY', 'COLOR','IMGURL','ALTTXT','NAME','PRICE']);  // .push(); ->define what you wanna put in the array
+ this push look like this..
    [//cart
     ['123456', 50, 'red'], //product
     ['123456', 100, 'white'], //product with different color variation = same ID but color, quantity different
@@ -69,7 +70,7 @@ cart.push(['ID', 'QUANTITY', 'COLOR','IMGURL','ALTTXT','NAME','PRICE']);  // .pu
    ]
    */
 // verifier si 'cart' n'est pas 'null' ??????
-let colorChosen = document.querySelector('option').value; //ne peux pas recuperer la valeur choisi
+let colorChosen = document.getElementById('colors').value; //'option'->ne peux pas recuperer la valeur choisi ...choisir <select>
 let quantityChosen = document.getElementById('quantity').value; //recuperer??
 let isProductInCart = false; 
 if(cart){
@@ -86,6 +87,7 @@ if(!isProductInCart){
     cart.push = [itemId, quantityChosen, colorChosen, itemImgUrl, itemAltTxt, itemName, itemPrice];
 }
 document.getElementById('addToCart').addEventListener('click', function(){
+    cart = localStorage.getItem('cart');
     localStorage.setItem('cart', cart); //('cart', JSON.stringify(cart)); var array = JSON.parse( localStorage.getItem('cart') );
     console.log(cart);
 })
