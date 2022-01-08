@@ -130,7 +130,12 @@ function sendForminfo(event){
                 return response.json();
             }
         })
-        .then(function(value){
+        .then(function(value){  //send the info of formula
+            const orderIdInJson = JSON.parse(jsonBody);
+            console.log(JSON.stringify(jsonBody));  //orderId???  How can I get????
+            console.log(orderIdInJson);
+            document.querySelector(form .cart__order__form).setAttribute('action','confirmation.html');
+            document.getElementById('orderId').innerHTML = orderIdInJson;
 
         })
         .catch(function(err){
@@ -142,7 +147,7 @@ let a = /[a-zA-Z]/g;    ----> g : global if there are more than 2 matches by str
 let b = new RegExp('[a-zA-Z]','g');  it is boolean so if there is no match, they return false 
 */
 let checkName = /[a-zA-Z]{2,}/g;
-let checkAddress = /[0-9][a-zA-Z]/g;
+let checkAddress = /^[\w.-]/g; // ^[A-Za-z0-9_.]+$   ^[\w.]+ ->azAZ09_ included []? )? ->can be with )
 let checkCity = /[a-zA-Z]{2,}/g;
 let checkEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/g;    
 //https://stackabuse.com/validate-email-addresses-with-regular-expressions-in-javascript/
@@ -172,7 +177,7 @@ document.querySelector('#lastName').addEventListener('input', function(event){
 });
 document.querySelector('#address').addEventListener('input', function(event){
     if(checkAddress.match(event.target.value) == false){    
-        document.getElementById('addressErrorMsg').innerHTML = "L'adresse est invalide.";
+        document.getElementById('addressErrorMsg').innerHTML = "L'adresse est invalide. Ce champ ne reçoit que des caractères, des nombres et '-'.";
     }
 });
 document.querySelector('#city').addEventListener('input', function(event){
@@ -182,17 +187,24 @@ document.querySelector('#city').addEventListener('input', function(event){
 });
 document.querySelector('#email').addEventListener('input', function(event){
     if(checkEmail.match(event.target.value) == false){    
-        document.getElementById('emailErrorMsg').innerHTML = "L'adresse Email est invalide.";
+        document.getElementById('emailErrorMsg').innerHTML = "L'adresse Email est invalide. Ecrivez comme abc@xxx.xx";
     }
 });
 
 
 document.querySelector('#order').addEventListener('click', function(event){
-    event.preventDefault();
+    
     if(){ //All of input are valid = function 'sendForminfo' IF NOT errMsg / alert
         sendForminfo();
+        
     } else {
+        event.preventDefault();
         alert("Il y a d'info manqué!");
     }
 });
 //document.querySelector('#order').addEventListener('click', sendForminfo);
+
+/*etape11   take the command ID by POST request 
+            affichier le numero de command sur confirmation.html (addEventlistener - innerHtML )
+    */
+
