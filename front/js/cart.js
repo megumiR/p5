@@ -8,9 +8,8 @@ if(localStorage.getItem('cart') !== null){
 } else{
     console.log(err);
 }
+//Creer des articles pour les produits selectionnes du cart
 //cart[0]=ID,[1]=QUANTITY,[2]=COLOR,[3]=IMGURL,[4]=ALTTXT,[5]=NAME,[6]=PRICE
-
-
 for(let product of cart){ //for in/of/while https://openclassrooms.com/en/courses/6175841-apprenez-a-programmer-avec-javascript/6279104-utilisez-la-bonne-boucle-pour-repeter-les-taches-for-while
 
     let cartItemArticle = document.createElement('article');
@@ -75,6 +74,18 @@ tableau récapitulatif (le panier). S’il y a plusieurs produits identiques
 (même id + même couleur), cela ne doit donner lieu qu’à une seule
 ligne dans le tableau -----encore sur cart.js?*/
 
+//Counter la quantite totale et le prix total
+let totalQuantity = 0; 
+let totalPrice = 0;
+
+for(let product of cart){
+    totalQuantity += document.querySelector(input .itemQuantity).value; 
+    totalPrice += cart[6];  ///??????? can i take the price like this?
+    console.log(totalQuantity, totalPrice);
+    }
+document.getElementById('totalQuantity').innerHTML = totalQuantity; 
+document.getElementById('totalPrice').innerHTML = totalPrice;
+
 /*etape9 gerer la modif la suppression quantite-eventlistener'change'
     la méthode Element.closest() devrait permettre de cibler le produit 
     que vous souhaitez supprimer (où dont vous souhaitez modifier la quantité) 
@@ -113,9 +124,9 @@ itemToBeDeleted.addEventListener('click', function(){ //p .deleteItem
         console.log('delete button is null');
     }
     */
-//THERE IS A LINE WHICH SHOWS TOTAL QUANTITY N TOTAL PRICE :LINE 74 cart,js
+//THERE IS A LINE WHICH SHOWS TOTAL QUANTITY N TOTAL PRICE :LINE 74 cart,js -->line7?
 
- //etape 10 valider la commande
+ //etape 10 valider la commande -->local storage? here , its for etape11 POST request to show orderId in confirmation
 function sendForminfo(event){
     fetch('http://localhost:3000/api/products/order', {
         method: 'POST',
@@ -208,3 +219,16 @@ document.querySelector('#order').addEventListener('click', function(event){
             affichier le numero de command sur confirmation.html (addEventlistener - innerHtML )
     */
 
+/*QUESTIONS
+    line134: const orderIdInJson = JSON.parse(jsonBody);
+            console.log(JSON.stringify(jsonBody));  //orderId???  How can I get????
+            console.log(orderIdInJson);
+    line81-: 
+    document.getElementById('totalQuantity').innerHTML = ; 
+    document.getElementById('totalPrice').innerHTML = ;
+    //with for we count? sum of quantity n price
+
+    line208: i dont  know what i should put in if()
+    line160:let checkAddress = /^[\w.-]/g;  need to change n check
+    
+            */
