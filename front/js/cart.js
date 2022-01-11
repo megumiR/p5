@@ -1,6 +1,6 @@
 // recuperer l'array via localstorage
 // check if its null or not ??? json.parse we need to check null or not before parse it
-let cart = [];
+let cart = localStorage.getItem('cart');
 //example  cart = ['id24558', 40, 'vert', 'http://localhost:3000/images/kanap01.jpeg', 'canape magnifique', 'Nalkou', '100,00'];
 async function takeItemInLocalStorage(){
     if(localStorage.getItem('cart') !== null){
@@ -74,22 +74,22 @@ for(let product of cart){ //for in/of/while https://openclassrooms.com/en/course
 
 async function cartItemArt(){
     await takeItemInLocalStorage();
-
-    document.getElementById('cart__items').innerHTML = 
-            `<article class="cart__item" data-id="{product-ID}" data-color="{product-color}">
+    for (let product of cart){
+        document.getElementById('cart__items').innerHTML = //LOOP cart.map((priduct)=>`ALL HTML`)???product.id
+            `<article class="cart__item" data-id="${product[0]}" data-color="${product[2]}">  <!--color incorrect-->
                 <div class="cart__item__img">
-                  <img src="../images/product01.jpg" alt="Photographie d'un canapé">
+                  <img src="${product[3]}" alt="${product[4]}">
                 </div>
                 <div class="cart__item__content">
                   <div class="cart__item__content__description">
-                    <h2>Nom du produit</h2>
-                    <p>Vert</p>
-                    <p>42,00 €</p>
+                    <h2>${product[5]}</h2>
+                    <p>${product[2]}</p>
+                    <p>${product[6]} €</p>
                   </div>
                   <div class="cart__item__content__settings">
                     <div class="cart__item__content__settings__quantity">
                       <p>Qté : </p>
-                      <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="42">
+                      <input type="number" id= "itemQuantity" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${product[1]}">
                     </div>
                     <div class="cart__item__content__settings__delete">
                       <p class="deleteItem">Supprimer</p>
@@ -97,9 +97,7 @@ async function cartItemArt(){
                   </div>
                 </div>
               </article> `
-
-
-
+    }
 };
 cartItemArt();
 
@@ -118,8 +116,8 @@ let totalQuantity = 0;
 let totalPrice = 0;
 
 for(let product of cart){
-    totalQuantity += document.querySelector(input .itemQuantity).value; 
-    totalPrice += cart[6];  ///??????? can i take the price like this?
+    totalQuantity += product[1]; 
+    totalPrice += product[6];  ///??????? can i take the price like this?
     console.log(totalQuantity, totalPrice);
     }
 document.getElementById('totalQuantity').innerHTML = totalQuantity; 
@@ -134,18 +132,27 @@ document.getElementById('totalPrice').innerHTML = totalPrice;
    if (closestelement == null){ 
 */
 
-let itemToBeModified = document.querySelector(input.itemQuantity).closest('');
-itemToBeModified.addEventListener('change',function(){  //'change'OR 'input' to see the change everytime
-    cart[1] = this.value; //how can i get the quantity of input?????  https://www.javascripttutorial.net/javascript-dom/javascript-change-event/
-    console.log(cart[1]);
+
+document.querySelector('input .itemQuantity').addEventListener('change',function(){  //'change'OR 'input' to see the change everytime
+    let itemToBeModified = document.querySelector('input.itemQuantity').closest('article');
+    let itemId = itemToBeModified.dataset.id;
+    let colorChosen = itemToBeModified.dataset.color;
+    
+    for (let product of cart){       
+        if(product[0] == itemId && product[2] == colorChosen){ 
+            cart[1] = this.value;
+        } 
+    }
+     //how can i get the quantity of input?????  https://www.javascripttutorial.net/javascript-dom/javascript-change-event/
+    localStorage.setItem('cart', cart);
 });
 
 
-let itemToBeDeleted = document.querySelector(input .deleteItem);
-    itemToBeDeleted.closest('article'); 
-itemToBeDeleted.addEventListener('click', function(){ //p .deleteItem
-    let itemToBeDeleted = document.querySelector(div .cart__item__content__settings__delete).closest('article');  //element.closest() ->target the element to change
-    localStorage.removeItem(itemToBeDeleted);  //localStorage.clear(); ->all delete localStorage.removeItem('cart')
+
+document.querySelector('input .deleteItem').addEventListener('click', function(){ //p .deleteItem
+    let itemToBeDeleted = document.querySelector('input .deleteItem').closest('article');  //element.closest() ->target the element to change
+    
+    //localStorage.removeItem(itemToBeDeleted);  //localStorage.clear(); ->all delete localStorage.removeItem('cart') .find ->trouver les items
     console.log(cart)  
 });
 /*   
@@ -208,8 +215,15 @@ let checkEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/g;
 /*let formCheckList = [[checkName, /[a-zA-Z]{2,}/g],[checkAddress, /[0-9][a-zA-Z]/g], [checkCity, /[a-zA-Z]{2,}/g], [checkEmail, /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/g]];
 let champ = ['#firstName', '#lastName',''];
 let errMsgId = [];
-let errMsg = [];*/
+let errMsg = [];
 
+let champs = document.querySelector(champ);
+champs.forEach(element => {
+    element.addEventListener('input', function(event){
+
+    });
+});
+*/
 //for(let i in ?????????){
 document.querySelector('#firstName').addEventListener('input', function(event){
 //document.querySelector(champ[i]).addEventListener('input', function(event){
@@ -254,6 +268,7 @@ document.querySelector('#order').addEventListener('click', function(event){
         alert("Il y a d'info manqué!");
     }
 });
+
 //document.querySelector('#order').addEventListener('click', sendForminfo);
 
 /*etape11   take the command ID by POST request 

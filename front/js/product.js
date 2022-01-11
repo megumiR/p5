@@ -12,10 +12,10 @@
     var itemImgUrl = search_params.get('imageUrl');   //its not working here
     var itemAltTxt = search_params.get('altTxt');     //its not working here
     var itemPrice = search_params.get('price');       //its not working here
-  /*  for (var value of search_params.values()){
+/*    for (var value of search_params.values()){
         console.log(value);                            ->same as a sonsole.log(itemId);
     }*/
-    console.log(itemId,itemName,itemImgUrl);
+    console.log("Display product of id=" + itemId);
 //etape6 Afficher une seule article, get request takes specific id's info
 
 let url = 'http://localhost:3000/api/products/' + itemId;    //get--parametre:/{product-ID}  =fetch('http..../' + {product-ID} )
@@ -40,8 +40,10 @@ fetch(url, {
         document.getElementById('description').textContent = product.description;   
 
         let imgDiv = document.createElement('img');
-            imgDiv.setAttribute('src', product.imageUrl);  
+            imgDiv.setAttribute('src', product.imageUrl); 
+            imgDiv.setAttribute('id', 'imgId'); 
             imgDiv.setAttribute('alt', product.altTxt); 
+            
             document.querySelector('.item__img').appendChild(imgDiv); 
         for (let color of product.colors){
             console.log(color);
@@ -96,8 +98,14 @@ document.getElementById('addToCart').addEventListener('click', function(){
 
 document.getElementById('addToCart').addEventListener('click',async function(){
     let cart = localStorage.getItem('cart');
+    console.log(cart);
     let colorChosen = await document.getElementById('colors').value; //'option'->ne peux pas recuperer la valeur choisi ...choisir <select>
     let quantityChosen = await document.getElementById('quantity').value; 
+    let itemImgUrl = document.getElementById('imgId').getAttribute('src');
+    let itemAltTxt =  document.getElementById('imgId').getAttribute('alt');
+    let itemName = document.getElementById('title').innerHTML;
+    let itemPrice = document.getElementById('price').innerHTML;
+
     let isProductInCart = false; 
     if(cart){
         for (let product of cart){       
@@ -110,8 +118,9 @@ document.getElementById('addToCart').addEventListener('click',async function(){
         cart = [];
     }
     if(!isProductInCart){
-        cart.push = ([itemId, quantityChosen, colorChosen, itemImgUrl, itemAltTxt, itemName, itemPrice]);
+        cart.push([itemId, quantityChosen, colorChosen, itemImgUrl, itemAltTxt, itemName, itemPrice]);
     }
+    
     localStorage.setItem('cart', cart);
     console.log(cart);
 })
