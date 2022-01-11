@@ -1,11 +1,9 @@
 //get product id to show on the screen etape5
  /*             var url = new URL('http://localhost:3000/api/products');  //表示Urlを取得。
                 var params = new URLSearchParams(url.search); //Urlについてるパラメータを取得。
-                //パラがあったらのIf文
-                if(params.has('_id')){
+                if(params.has('_id')){                        //パラがあったらのIf文
                     var itemId = params.get('_id');
-                    console.log(itemId)
-                    //send the choice to product page??
+                    console.log(itemId);
                 }  */
     
     var search_params = new URLSearchParams(document.location.search); //document.location.search = URL de cette page
@@ -18,9 +16,11 @@
         console.log(value);                            ->same as a sonsole.log(itemId);
     }*/
     console.log(itemId,itemName,itemImgUrl);
-//etape6 une seule article affiche, get request takes specific id's info
-//get--parametre:/{product-ID}  =fetch('http..../' + {product-ID} )
-let url = 'http://localhost:3000/api/products/' + itemId;
+//etape6 Afficher une seule article, get request takes specific id's info
+
+let url = 'http://localhost:3000/api/products/' + itemId;    //get--parametre:/{product-ID}  =fetch('http..../' + {product-ID} )
+//async function showSelectedProduct(){
+//await
 fetch(url, {
     method: 'GET',                                  
         headers: {
@@ -34,7 +34,7 @@ fetch(url, {
         }
     }) 
     .then(function(product){  // Search_Params.get('_id')のデータGETした上で、返ってくる１商品のProductInfoを使ってく
-        //etape6 return l'element correspondant a {product-ID}　何番目のデータか確認して名前つけたらproduct.nameみたいに引っ張れる？
+        //etape6 return l'element correspondant a {product-ID}　１商品のProductInfoしかないけん各情報をproduct.nameみたいに引っ張れる
         document.getElementById('title').innerHTML = product.name;  //itemName
         document.getElementById('price').innerHTML = product.price;  //itemPrice
         document.getElementById('description').textContent = product.description;   
@@ -54,11 +54,12 @@ fetch(url, {
     .catch(function(err){
         console.log(err)
     });
+//}
+//showSelectedProduct();
 
-    //etape7 store info(color,quantity,) in a localstorage 
 
-    /* if ( color && id == same product) ++; eventListener('click', ) store []; in localstorage
-    */
+//etape7 store info(color,quantity,) in a localstorage ----if ( color && id == same product) ++; eventListener('click', ) store []; in localstorage???
+    
 // avant modif-> let cart = []; apres (et mettre dans eventListener->let cart = localStorage.getItem('cart');
 /*EX:Ne pas faire de push car elles vont etre stockees dans le cart) 
       cart.push(['ID', 'QUANTITY', 'COLOR','IMGURL','ALTTXT','NAME','PRICE']);  // .push(); ->define what you wanna put in the array
@@ -70,11 +71,11 @@ fetch(url, {
    ]
    */
 // verifier si 'cart' n'est pas 'null' ??????
-let colorChosen = document.getElementById('colors').value; //'option'->ne peux pas recuperer la valeur choisi ...choisir <select>
+/*let colorChosen = document.getElementById('colors').value; //'option'->ne peux pas recuperer la valeur choisi ...choisir <select>
 let quantityChosen = document.getElementById('quantity').value; //recuperer??
 let isProductInCart = false; 
 if(cart){
-    for (let product of cart){       
+    for (let product of cart){       //o-product[0] x-cart[0] each product in the cart , we talk about
         if(cart[0] == product.itemId && cart[2] == product.colorChosen){  // if(cart[0] == itemId && cart[2] == colorChosen){
             cart[1] += product.quantityChosen;   //cart[1] += quantityChosen;
             let isProductInCart = true; 
@@ -90,5 +91,27 @@ document.getElementById('addToCart').addEventListener('click', function(){
     cart = localStorage.getItem('cart');
     localStorage.setItem('cart', cart); //('cart', JSON.stringify(cart)); var array = JSON.parse( localStorage.getItem('cart') );
     console.log(cart);
-})
+})*/
 //    localStorage.getItem('ID'); //page panier?
+
+document.getElementById('addToCart').addEventListener('click',async function(){
+    let cart = localStorage.getItem('cart');
+    let colorChosen = await document.getElementById('colors').value; //'option'->ne peux pas recuperer la valeur choisi ...choisir <select>
+    let quantityChosen = await document.getElementById('quantity').value; 
+    let isProductInCart = false; 
+    if(cart){
+        for (let product of cart){       
+            if(product[0] == itemId && product[2] == colorChosen){ 
+                product[1] += quantityChosen;  
+                let isProductInCart = true; 
+            } 
+        }
+    } else {
+        cart = [];
+    }
+    if(!isProductInCart){
+        cart.push = ([itemId, quantityChosen, colorChosen, itemImgUrl, itemAltTxt, itemName, itemPrice]);
+    }
+    localStorage.setItem('cart', cart);
+    console.log(cart);
+})

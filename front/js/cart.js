@@ -2,23 +2,26 @@
 // check if its null or not ??? json.parse we need to check null or not before parse it
 let cart = [];
 //example  cart = ['id24558', 40, 'vert', 'http://localhost:3000/images/kanap01.jpeg', 'canape magnifique', 'Nalkou', '100,00'];
-if(localStorage.getItem('cart') !== null){
-    cart = localStorage.getItem('cart');
-    console.log(cart);
-} else{
-    console.log(err);
+async function takeItemInLocalStorage(){
+    if(localStorage.getItem('cart') !== null){
+        cart = await localStorage.getItem('cart');
+        console.log(cart);
+    } else{
+        console.log(err);
+    }
 }
 //Creer des articles pour les produits selectionnes du cart
 //cart[0]=ID,[1]=QUANTITY,[2]=COLOR,[3]=IMGURL,[4]=ALTTXT,[5]=NAME,[6]=PRICE
+/*
 for(let product of cart){ //for in/of/while https://openclassrooms.com/en/courses/6175841-apprenez-a-programmer-avec-javascript/6279104-utilisez-la-bonne-boucle-pour-repeter-les-taches-for-while
 
     let cartItemArticle = document.createElement('article');
         cartItemArticle.classList.add('cart__item');
         cartItemArticle.setAttribute('data-id', cart[0]); //{product-ID} itemId ..product.cart[0]??
         cartItemArticle.setAttribute('data-color', cart[2]); //{product-color}
-/*      cartItemArticle.dataset.id = cart[0];  OR it's just to know if there is already the data-xxx??
-        cartItemArticle.dataset.color = cart[2];
-*/    
+//     cartItemArticle.dataset.id = cart[0];  OR it's just to know if there is already the data-xxx??
+//        cartItemArticle.dataset.color = cart[2];
+    
     let divImg = document.createElement('div');
         divImg.classList.add('cart__item__img');
         let img = document.createElement('img');
@@ -67,7 +70,43 @@ for(let product of cart){ //for in/of/while https://openclassrooms.com/en/course
     cartItemArticle.appendChild(divImg, divContent);
    
     document.getElementById('cart__items').appendChild(cartItemArticle);
-}
+}*/
+
+async function cartItemArt(){
+    await takeItemInLocalStorage();
+
+    document.getElementById('cart__items').innerHTML = 
+            `<article class="cart__item" data-id="{product-ID}" data-color="{product-color}">
+                <div class="cart__item__img">
+                  <img src="../images/product01.jpg" alt="Photographie d'un canapé">
+                </div>
+                <div class="cart__item__content">
+                  <div class="cart__item__content__description">
+                    <h2>Nom du produit</h2>
+                    <p>Vert</p>
+                    <p>42,00 €</p>
+                  </div>
+                  <div class="cart__item__content__settings">
+                    <div class="cart__item__content__settings__quantity">
+                      <p>Qté : </p>
+                      <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="42">
+                    </div>
+                    <div class="cart__item__content__settings__delete">
+                      <p class="deleteItem">Supprimer</p>
+                    </div>
+                  </div>
+                </div>
+              </article> `
+
+
+
+};
+cartItemArt();
+
+
+
+
+
 
 /*Attention de ne pas dupliquer inutilement les éléments dans le
 tableau récapitulatif (le panier). S’il y a plusieurs produits identiques
@@ -127,8 +166,9 @@ itemToBeDeleted.addEventListener('click', function(){ //p .deleteItem
 //THERE IS A LINE WHICH SHOWS TOTAL QUANTITY N TOTAL PRICE :LINE 74 cart,js -->line7?
 
  //etape 10 valider la commande -->local storage? here , its for etape11 POST request to show orderId in confirmation
-function sendForminfo(event){
-    fetch('http://localhost:3000/api/products/order', {
+//passer une commande ,  La requête post ne prend pas encore en considération la quantité ni la couleur des produits achetés.
+async function sendForminfo(event){
+   await fetch('http://localhost:3000/api/products/order', {    //async await?????????
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -138,7 +178,8 @@ function sendForminfo(event){
     })
         .then(function(response){
             if(response.ok){
-                return response.json();
+                console.log(response.json());
+                //return response.json();
             }
         })
         .then(function(value){  //send the info of formula
@@ -205,7 +246,7 @@ document.querySelector('#email').addEventListener('input', function(event){
 
 document.querySelector('#order').addEventListener('click', function(event){
     
-    if(){ //All of input are valid = function 'sendForminfo' IF NOT errMsg / alert
+    if(checkName.match(event.target.value) == true){ //All of input are valid = function 'sendForminfo' IF NOT errMsg / alert
         sendForminfo();
         
     } else {
@@ -231,4 +272,5 @@ document.querySelector('#order').addEventListener('click', function(event){
     line208: i dont  know what i should put in if()
     line160:let checkAddress = /^[\w.-]/g;  need to change n check
     
+    same color,same id -> change the quantity n dont show them separately
             */

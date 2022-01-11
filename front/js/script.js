@@ -53,25 +53,25 @@ function requestGet(){
 */
 
 
-//function requestGet(){ 
+//creer la requete GET pour recuperer les info du produit 
     fetch('http://localhost:3000/api/products',{
-        method: 'GET',       // for a GET request, we just write fetch(URL).then???? 
+        method: 'GET',       // for a GET request, we just write fetch(URL).then???? If there's no body , it seems fine
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
         }
     })
     .then(function(response){
-        if(response.ok){
+        if(response.ok){   //console.log(response.json()); to check
         return response.json();
         }
     })    
-    .then(function(products){  //le parametre entre() est le resultat de l'appel API = products 
+    .then(function(products){  //le parametre entre() est le resultat de l'appel API = products info
+        //console.log(products);
        // const products = [response.json];  localhost product list should be the array...the URL
         for (let product of products) {
             //let OR const? -> image changes every time so let is better 
             let productImage = document.createElement('img');
-               // productImage.textContent = img;  n'a pas besoin?
                 productImage.setAttribute('src', product.imageUrl);
                 productImage.setAttribute('alt', product.altTxt);
             let productName = document.createElement('h3');
@@ -85,20 +85,19 @@ function requestGet(){
             newItem.appendChild(productImage);
             newItem.appendChild(productName);
             newItem.appendChild(productDescription);
-//Etape4 creer un lien
+//Etape4 creer un lien pour redigirer a la page produit
             let newItemLink = document.createElement('a');
             let eachLinkWithId = './product.html?id=' + product._id;
             newItemLink.setAttribute('href', eachLinkWithId);
             newItemLink.appendChild(newItem);
 
-            //newItemのカードをセクションItemsに最後子要素として挿入する newItem--> with link: newItemLink
             document.getElementById('items').appendChild(newItemLink); 
         }
     })
     .catch(function(err){
         console.log(err);
     });  
-//}
+
 
 
 //send POST request via Ajax bloc2-4fr all shoud be inside a -> 
