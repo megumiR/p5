@@ -6,13 +6,13 @@
                     console.log(itemId);
                 }  */
     
-    var search_params = new URLSearchParams(document.location.search); //document.location.search = URL de cette page
-    var itemId = search_params.get('id');  //id OR _id -> follow the one you can see <a href>on inspector google
-    var itemName = search_params.get('name');          //its not working here
-    var itemImgUrl = search_params.get('imageUrl');   //its not working here
-    var itemAltTxt = search_params.get('altTxt');     //its not working here
-    var itemPrice = search_params.get('price');       //its not working here
-/*    for (var value of search_params.values()){
+    let search_params = new URLSearchParams(document.location.search); //document.location.search = URL de cette page
+    let itemId = search_params.get('id');  //id OR _id -> follow the one you can see <a href>on inspector google
+/*    var itemName = search_params.get('name');          //it will not work this way. It gets only id
+    var itemImgUrl = search_params.get('imageUrl');   //    Cuz this page's URL contains only id not name or others
+    var itemAltTxt = search_params.get('altTxt');     
+    var itemPrice = search_params.get('price');       
+OR    for (var value of search_params.values()){
         console.log(value);                            ->same as a sonsole.log(itemId);
     }*/
     console.log("Display product of id=" + itemId);
@@ -97,20 +97,22 @@ document.getElementById('addToCart').addEventListener('click', function(){
 //    localStorage.getItem('ID'); //page panier?
 
 document.getElementById('addToCart').addEventListener('click',async function(){
-    let cart = localStorage.getItem('cart');
-    console.log(cart);
+    let cart = JSON.parse(localStorage.getItem('cart'));
+  //  console.log(cart);
     let colorChosen = await document.getElementById('colors').value; //'option'->ne peux pas recuperer la valeur choisi ...choisir <select>
-    let quantityChosen = await document.getElementById('quantity').value; 
+    let quantityChosen =  document.getElementById('quantity').value; 
     let itemImgUrl = document.getElementById('imgId').getAttribute('src');
-    let itemAltTxt =  document.getElementById('imgId').getAttribute('alt');
+    let itemAltTxt = document.getElementById('imgId').getAttribute('alt');
     let itemName = document.getElementById('title').innerHTML;
     let itemPrice = document.getElementById('price').innerHTML;
 
     let isProductInCart = false; 
     if(cart){
-        for (let product of cart){       
+        for (let product of cart){    
+             console.log(product[1]);  
             if(product[0] == itemId && product[2] == colorChosen){ 
-                product[1] += quantityChosen;  
+                console.log(quantityChosen); 
+                product[1] += quantityChosen;    
                 let isProductInCart = true; 
             } 
         }
@@ -118,9 +120,17 @@ document.getElementById('addToCart').addEventListener('click',async function(){
         cart = [];
     }
     if(!isProductInCart){
+        //cart.push([{ID : itemId, QUANTITY: quantityChosen, COLOR: colorChosen, IMGURL: itemImgUrl, IMGALT: itemAltTxt, NAME: itemName, PRICE: itemPrice}]);
+           
+
         cart.push([itemId, quantityChosen, colorChosen, itemImgUrl, itemAltTxt, itemName, itemPrice]);
     }
-    
-    localStorage.setItem('cart', cart);
+    try{
+    localStorage.setItem('cart', JSON.stringify(cart));
+    } catch(err){    //en cas d'espace manqué sur localstorage
+        console.log(err)
+    }
     console.log(cart);
 })
+
+// 同色同型の追加注文: 注文個数追加ができてない

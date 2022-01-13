@@ -1,10 +1,10 @@
 // recuperer l'array via localstorage
 // check if its null or not ??? json.parse we need to check null or not before parse it
-let cart = localStorage.getItem('cart');
-//example  cart = ['id24558', 40, 'vert', 'http://localhost:3000/images/kanap01.jpeg', 'canape magnifique', 'Nalkou', '100,00'];
+let cart = JSON.parse(localStorage.getItem('cart'));
+
 async function takeItemInLocalStorage(){
     if(localStorage.getItem('cart') !== null){
-        cart = await localStorage.getItem('cart');
+        cart = JSON.parse(localStorage.getItem('cart'));
         console.log(cart);
     } else{
         console.log(err);
@@ -12,70 +12,12 @@ async function takeItemInLocalStorage(){
 }
 //Creer des articles pour les produits selectionnes du cart
 //cart[0]=ID,[1]=QUANTITY,[2]=COLOR,[3]=IMGURL,[4]=ALTTXT,[5]=NAME,[6]=PRICE
-/*
-for(let product of cart){ //for in/of/while https://openclassrooms.com/en/courses/6175841-apprenez-a-programmer-avec-javascript/6279104-utilisez-la-bonne-boucle-pour-repeter-les-taches-for-while
-
-    let cartItemArticle = document.createElement('article');
-        cartItemArticle.classList.add('cart__item');
-        cartItemArticle.setAttribute('data-id', cart[0]); //{product-ID} itemId ..product.cart[0]??
-        cartItemArticle.setAttribute('data-color', cart[2]); //{product-color}
-//     cartItemArticle.dataset.id = cart[0];  OR it's just to know if there is already the data-xxx??
-//        cartItemArticle.dataset.color = cart[2];
-    
-    let divImg = document.createElement('div');
-        divImg.classList.add('cart__item__img');
-        let img = document.createElement('img');
-            img.setAttribute('src', cart[3]); //??????imageUrl
-            img.setAttribute('alt', cart[4]);  //??????altTxt
-        divImg.appendChild(img);
-    
-    let divContent = document.createElement('div');
-        divContent.classList.add('cart__item__content');
-            let divDescription = document.createElement('div');
-                divDescription.classList.add('cart__item__content__description');
-            
-            let productName = document.createElement('h2');
-                productName.innerHTML = cart[5];  //??????name
-            let color = document.createElement('p');
-                color.innerHTML = cart[2];  //??????colorChosen
-            let price = document.createElement('p');
-                price.innerHTML = cart[6] + '€';  //??????price centime et , entre € et cent
-    
-            divDescription.appendChild(productName, color, price);
-    
-            let divSetting = document.createElement('div');
-                divSetting.classList.add('cart__item__content__settings');
-            let divSetQuantity = document.createElement('div');
-                divSetQuantity.classList.add('cart__item__content__settings__quantity');
-            let quantity = document.createElement('p');
-                quantity.innerHTML = 'Qté : '; // 'Qté : ' + <input  type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="42">
-            let quantityInput = document.createElement('input');
-                quantityInput.setAttribute(('type', 'number'),('name', 'itemQuantity'), ('min', 1), ('max', 100), ('value', '42???'));
-                quantityInput.classList.add('itemQuantity');
-            divSetting.appendChild(divSetQuantity, quantityInput);
-    
-            let divDelete = document.createElement('div');
-                divDelete.classList.add('cart__item__content__settings__delete');
-        //    let deleteItem = document.createElement('p');
-            //    deleteItem.classList.add('deleteItem');
-            //    deleteItem.innerHTML = 'Supprimer';
-                let deleteItem = document.createElement('input');
-                deleteItem.classList.add('deleteItem');
-                deleteItem.setAttribute(('type','button'),('value','Supprimer'), ('name', 'deletebutton'));     
-
-            divDelete.appendChild(deleteItem);
-    
-        divContent.appendChild(divDescription, divSetting, divDelete);
-    
-    cartItemArticle.appendChild(divImg, divContent);
-   
-    document.getElementById('cart__items').appendChild(cartItemArticle);
-}*/
-
 async function cartItemArt(){
     await takeItemInLocalStorage();
     for (let product of cart){
-        document.getElementById('cart__items').innerHTML = //LOOP cart.map((priduct)=>`ALL HTML`)???product.id
+        console.log(product[5]); //it was id's 5th letter not as a 5th data String because of lack of JSON.parse
+        let cartItemArticle = document.createElement('div')
+        cartItemArticle.innerHTML = //LOOP cart.map((priduct)=>`ALL HTML`)???product.id
             `<article class="cart__item" data-id="${product[0]}" data-color="${product[2]}">  <!--color incorrect-->
                 <div class="cart__item__img">
                   <img src="${product[3]}" alt="${product[4]}">
@@ -97,6 +39,8 @@ async function cartItemArt(){
                   </div>
                 </div>
               </article> `
+
+        document.getElementById('cart__items').appendChild(cartItemArticle); 
     }
 };
 cartItemArt();
@@ -114,7 +58,11 @@ ligne dans le tableau -----encore sur cart.js?*/
 //Counter la quantite totale et le prix total
 let totalQuantity = 0; 
 let totalPrice = 0;
+function sum(cart){            //.find or .indexOf https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf
+    console.log(cart.price);  //OR .splice https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/Array/splice
 
+}
+console.log(cart.find(sum));
 for(let product of cart){
     totalQuantity += product[1]; 
     totalPrice += product[6];  ///??????? can i take the price like this?
@@ -190,7 +138,7 @@ async function sendForminfo(event){
             }
         })
         .then(function(value){  //send the info of formula
-            const orderIdInJson = JSON.parse(jsonBody);
+            let orderIdInJson = JSON.parse(jsonBody);
             console.log(JSON.stringify(jsonBody));  //orderId???  How can I get????
             console.log(orderIdInJson);
             document.querySelector(form .cart__order__form).setAttribute('action','confirmation.html');
