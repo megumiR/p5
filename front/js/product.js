@@ -35,7 +35,7 @@ fetch(url, {
     }) 
     .then(function(product){  // Search_Params.get('_id')のデータGETした上で、返ってくる１商品のProductInfoを使ってく
         //etape6 return l'element correspondant a {product-ID}　１商品のProductInfoしかないけん各情報をproduct.nameみたいに引っ張れる
-        document.getElementById('title').innerHTML = product.name;  //itemName
+        document.getElementById('title').textContent = product.name;  //itemName  innerHTML ->textContent??
         document.getElementById('price').innerHTML = product.price;  //itemPrice
         document.getElementById('description').textContent = product.description;   
 
@@ -49,7 +49,7 @@ fetch(url, {
             console.log(color);
             let colorOption = document.createElement('option');
             colorOption.setAttribute('value', color);
-            colorOption.innerHTML = color;    //dont forget to show on screen as a string
+            colorOption.textContent = color;    //dont forget to show on screen as a string
             document.getElementById('colors').appendChild(colorOption);
         }
     })
@@ -103,27 +103,36 @@ document.getElementById('addToCart').addEventListener('click',async function(){
     let quantityChosen =  document.getElementById('quantity').value; 
     let itemImgUrl = document.getElementById('imgId').getAttribute('src');
     let itemAltTxt = document.getElementById('imgId').getAttribute('alt');
-    let itemName = document.getElementById('title').innerHTML;
-    let itemPrice = document.getElementById('price').innerHTML;
+    let itemName = document.getElementById('title').textContent;  //textContent??
+  //  let itemPrice = document.getElementById('price').innerHTML;
 
     let isProductInCart = false; 
     if(cart){
-        for (let product of cart){    
-             console.log(product[1]);  
-            if(product[0] == itemId && product[2] == colorChosen){ 
+       // cart = JSON.parse(cart);
+        for (let product of cart){     
+            if(product.id == itemId && product.color == colorChosen){ 
                 console.log(quantityChosen); 
-                product[1] += quantityChosen;    
-                let isProductInCart = true; 
+                product.quantity += parseInt(quantityChosen*1);    
+                isProductInCart = true; 
+                break;
             } 
         }
     } else {
         cart = [];
     }
     if(!isProductInCart){
-        //cart.push([{ID : itemId, QUANTITY: quantityChosen, COLOR: colorChosen, IMGURL: itemImgUrl, IMGALT: itemAltTxt, NAME: itemName, PRICE: itemPrice}]);
+        cart.push({
+            id : itemId, 
+            quantity: quantityChosen, 
+            color: colorChosen, 
+            imgUrl: itemImgUrl, 
+            altTxt: itemAltTxt, 
+            name: itemName, 
+        //    price: parseFloat(itemPrice)
+        });
            
 
-        cart.push([itemId, quantityChosen, colorChosen, itemImgUrl, itemAltTxt, itemName, itemPrice]);
+        //cart.push([itemId, quantityChosen, colorChosen, itemImgUrl, itemAltTxt, itemName, itemPrice]);
     }
     try{
     localStorage.setItem('cart', JSON.stringify(cart));
@@ -133,4 +142,4 @@ document.getElementById('addToCart').addEventListener('click',async function(){
     console.log(cart);
 })
 
-// 同色同型の追加注文: 注文個数追加ができてない
+// Line 115: 同色同型の追加注文: 注文個数追加ができてない

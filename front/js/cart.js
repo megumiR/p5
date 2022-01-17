@@ -10,28 +10,73 @@ async function takeItemInLocalStorage(){
         console.log(err);
     }
 }
+//creer la requete GET pour recuperer les info du produit 
+async function getPrice(){
+    fetch('http://localhost:3000/api/products',{
+        method: 'GET',       // for a GET request, we just write fetch(URL).then???? If there's no body , it seems fine
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(function(response){
+        if(response.ok){   //console.log(response.json()); to check
+        return response.json();
+        }
+    })    
+    .then(function(products){  //le parametre entre() est le resultat de l'appel API = products info
+        for (let product of products){
+            document.getElementById('productPrice').innerHTML = product.price + " €";
+        }
+        let price = {id , price};
+        console.log(products.price);
+    })
+    .catch(function(err){
+        console.log(err)
+    
+    });
+}
 //Creer des articles pour les produits selectionnes du cart
 //cart[0]=ID,[1]=QUANTITY,[2]=COLOR,[3]=IMGURL,[4]=ALTTXT,[5]=NAME,[6]=PRICE
 async function cartItemArt(){
     await takeItemInLocalStorage();
+    await getPrice();
     for (let product of cart){
-        console.log(product[5]); //it was id's 5th letter not as a 5th data String because of lack of JSON.parse
+        console.log(product.name); //it was id's 5th letter not as a 5th data String because of lack of JSON.parse
+
+/*Attention de ne pas dupliquer inutilement les éléments dans le
+tableau récapitulatif (le panier). S’il y a plusieurs produits identiques
+(même id + même couleur), cela ne doit donner lieu qu’à une seule
+ligne dans le tableau */
+        
+  /*      function findDuplicatedItem(product) {
+            if(product.id == product[0] && product.color == product[2]){
+                let n = cart.indexOf(product.id);
+                let replaceItem = n -1;
+                cart.splice(n, 1, replaceItem)
+            }
+        }
+        cart.find(findDuplicatedItem)
+        
+        findDuplicatedItem();
+        console.log();                     */
+                 
         let cartItemArticle = document.createElement('div')
         cartItemArticle.innerHTML = //LOOP cart.map((priduct)=>`ALL HTML`)???product.id
-            `<article class="cart__item" data-id="${product[0]}" data-color="${product[2]}">  <!--color incorrect-->
+            `<article class="cart__item" data-id="${product.id}" data-color="${product.color}">  <!--color incorrect-->
                 <div class="cart__item__img">
-                  <img src="${product[3]}" alt="${product[4]}">
+                  <img src="${product.imgUrl}" alt="${product.altTxt}">
                 </div>
                 <div class="cart__item__content">
                   <div class="cart__item__content__description">
-                    <h2>${product[5]}</h2>
-                    <p>${product[2]}</p>
-                    <p>${product[6]} €</p>
+                    <h2>${product.name}</h2>
+                    <p>${product.color}</p>
+                    <p id="productPrice">${product.price} €</p>
                   </div>
                   <div class="cart__item__content__settings">
                     <div class="cart__item__content__settings__quantity">
                       <p>Qté : </p>
-                      <input type="number" id= "itemQuantity" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${product[1]}">
+                      <input type="number" class="itemQuantity" id=="itemQuantity" name="itemQuantity" min="1" max="100" value="${product[1]}">
                     </div>
                     <div class="cart__item__content__settings__delete">
                       <p class="deleteItem">Supprimer</p>
@@ -42,34 +87,29 @@ async function cartItemArt(){
 
         document.getElementById('cart__items').appendChild(cartItemArticle); 
     }
+    let quantityInput = document.getElementById('#itemQuantity');
+    console.log(quantityInput);
+    changeItemQuantity();
+
 };
 cartItemArt();
 
-
-
-
-
-
-/*Attention de ne pas dupliquer inutilement les éléments dans le
-tableau récapitulatif (le panier). S’il y a plusieurs produits identiques
-(même id + même couleur), cela ne doit donner lieu qu’à une seule
-ligne dans le tableau -----encore sur cart.js?*/
-
 //Counter la quantite totale et le prix total
+async function showTotalQuantitynPrice(){
 let totalQuantity = 0; 
-let totalPrice = 0;
-function sum(cart){            //.find or .indexOf https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf
-    console.log(cart.price);  //OR .splice https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/Array/splice
+let totalPrice =0;
+let pricePerProduct = [];
+pricePerProduct = getPrice();
 
-}
-console.log(cart.find(sum));
 for(let product of cart){
-    totalQuantity += product[1]; 
-    totalPrice += product[6];  ///??????? can i take the price like this?
-    console.log(totalQuantity, totalPrice);
+    totalQuantity += 1 * product.quantity;        ///on peut laisser la numero bizzare 1* ?
+    totalPrice += product.quantity * pricePerProduct;  ///??????? can i take the price like this? YES!!:)
+    console.log("The totalQuantity in cart is "+ totalQuantity, "The total price in cart is "+ totalPrice);
     }
-document.getElementById('totalQuantity').innerHTML = totalQuantity; 
-document.getElementById('totalPrice').innerHTML = totalPrice;
+document.getElementById('totalQuantity').textContent = totalQuantity; 
+document.getElementById('totalPrice').textContent = totalPrice;
+}
+showTotalQuantitynPrice();
 
 /*etape9 gerer la modif la suppression quantite-eventlistener'change'
     la méthode Element.closest() devrait permettre de cibler le produit 
@@ -79,30 +119,44 @@ document.getElementById('totalPrice').innerHTML = totalPrice;
    var closestelement = element.closest('string --ex)p:hover, .toto + q'); 
    if (closestelement == null){ 
 */
-
-
-document.querySelector('input .itemQuantity').addEventListener('change',function(){  //'change'OR 'input' to see the change everytime
-    let itemToBeModified = document.querySelector('input.itemQuantity').closest('article');
-    let itemId = itemToBeModified.dataset.id;
-    let colorChosen = itemToBeModified.dataset.color;
-    
-    for (let product of cart){       
-        if(product[0] == itemId && product[2] == colorChosen){ 
-            cart[1] = this.value;
-        } 
-    }
-     //how can i get the quantity of input?????  https://www.javascripttutorial.net/javascript-dom/javascript-change-event/
-    localStorage.setItem('cart', cart);
+//Changement de quantite du produit
+function changeItemQuantity(){
+    document.getElementById('#itemQuantity').addEventListener('change', function(){  //'change'OR 'input' to see the change everytime
+        let itemToBeModified = document.getElementById('#itemQuantity').closest('article');
+        let itemId = itemToBeModified.dataset.id;
+        let colorChosen = itemToBeModified.dataset.color;
+        
+        for (let product of cart){       
+            if(product[0] == itemId && product[2] == colorChosen){ 
+                //cart[1] = this.value;
+                product[1] = document.getElementById('#itemQuantity').value;
+                
+            } 
+        }
+        //how can i get the quantity of input?????  https://www.javascripttutorial.net/javascript-dom/javascript-change-event/
+        try{
+            localStorage.setItem('cart', JSON.stringify(cart));
+        } catch(err){    
+            console.log(err)
+        }
 });
+}
+
+    //.find or .indexOf https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf
+    //OR .splice https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/Array/splice
 
 
-
+//effacement d'un produit
 document.querySelector('input .deleteItem').addEventListener('click', function(){ //p .deleteItem
     let itemToBeDeleted = document.querySelector('input .deleteItem').closest('article');  //element.closest() ->target the element to change
+    if(document.getElementsByClassName(cart__item).dataset.id == product[0]){
+        document.getElementById('cart__items').removeChild(itemToBeDeleted);
+    }
     
     //localStorage.removeItem(itemToBeDeleted);  //localStorage.clear(); ->all delete localStorage.removeItem('cart') .find ->trouver les items
     console.log(cart)  
 });
+  
 /*   
     let itemToBeDeleted = [];
     itemToBeDeleted = localStorage.getItem('cart', cart[0] == itemID && cart[2] == colorChosen); /*?????
@@ -204,8 +258,15 @@ document.querySelector('#email').addEventListener('input', function(event){
         document.getElementById('emailErrorMsg').innerHTML = "L'adresse Email est invalide. Ecrivez comme abc@xxx.xx";
     }
 });
-
-
+function b(){
+    const a = input.value === xxx
+    if(a){
+        errMessages.classList.add('hidden');
+    } else{
+        errMessages.classList.remove('hidden');
+    }
+return a
+}
 document.querySelector('#order').addEventListener('click', function(event){
     
     if(checkName.match(event.target.value) == true){ //All of input are valid = function 'sendForminfo' IF NOT errMsg / alert
@@ -224,6 +285,10 @@ document.querySelector('#order').addEventListener('click', function(event){
     */
 
 /*QUESTIONS
+    totalQuantity += 1 * product[1];        ///on peut laisser la numero bizzare 1* ?
+
+    document.querySelector('input .itemQuantity'); //we see the value but it's null so function doesnt work
+
     line134: const orderIdInJson = JSON.parse(jsonBody);
             console.log(JSON.stringify(jsonBody));  //orderId???  How can I get????
             console.log(orderIdInJson);
