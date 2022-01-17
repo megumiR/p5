@@ -28,8 +28,6 @@ async function getPrice(){
         for (let product of products){
             document.getElementById('productPrice').innerHTML = product.price + " €";
         }
-        let price = {id , price};
-        console.log(products.price);
     })
     .catch(function(err){
         console.log(err)
@@ -96,14 +94,13 @@ cartItemArt();
 
 //Counter la quantite totale et le prix total
 async function showTotalQuantitynPrice(){
+   // await cartItemArt();  --> 2 articles become 4 -o-
 let totalQuantity = 0; 
 let totalPrice =0;
-let pricePerProduct = [];
-pricePerProduct = getPrice();
 
 for(let product of cart){
     totalQuantity += 1 * product.quantity;        ///on peut laisser la numero bizzare 1* ?
-    totalPrice += product.quantity * pricePerProduct;  ///??????? can i take the price like this? YES!!:)
+    totalPrice += product.quantity * document.getElementById('productPrice').value;  ///??????? can i take the price like this? YES!!:)
     console.log("The totalQuantity in cart is "+ totalQuantity, "The total price in cart is "+ totalPrice);
     }
 document.getElementById('totalQuantity').textContent = totalQuantity; 
@@ -120,43 +117,58 @@ showTotalQuantitynPrice();
    if (closestelement == null){ 
 */
 //Changement de quantite du produit
-function changeItemQuantity(){
-    document.getElementById('#itemQuantity').addEventListener('change', function(){  //'change'OR 'input' to see the change everytime
-        let itemToBeModified = document.getElementById('#itemQuantity').closest('article');
+//function changeItemQuantity(){
+    const itemsQuantity = document.querySelectorAll('.itemQuantity');
+
+    for (let i = 0; i < itemsQuantity.length; i++){//(let i in itemsQuantity){
+    itemsQuantity[i].addEventListener('change', function(){  //'change'OR 'input' to see the change everytime
+        let itemToBeModified = itemsQuantity[i].closest('article');
         let itemId = itemToBeModified.dataset.id;
         let colorChosen = itemToBeModified.dataset.color;
         
         for (let product of cart){       
-            if(product[0] == itemId && product[2] == colorChosen){ 
+            if(product.id == itemId && product.color == colorChosen){ 
                 //cart[1] = this.value;
-                product[1] = document.getElementById('#itemQuantity').value;
+                product.quantity = parseInt(this.value);
                 
             } 
         }
         //how can i get the quantity of input?????  https://www.javascripttutorial.net/javascript-dom/javascript-change-event/
-        try{
+        
             localStorage.setItem('cart', JSON.stringify(cart));
-        } catch(err){    
-            console.log(err)
-        }
+            console.log(cart);
+        
 });
-}
+    }
+//}
 
     //.find or .indexOf https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf
     //OR .splice https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/Array/splice
 
 
 //effacement d'un produit
-document.querySelector('input .deleteItem').addEventListener('click', function(){ //p .deleteItem
-    let itemToBeDeleted = document.querySelector('input .deleteItem').closest('article');  //element.closest() ->target the element to change
-    if(document.getElementsByClassName(cart__item).dataset.id == product[0]){
-        document.getElementById('cart__items').removeChild(itemToBeDeleted);
-    }
+const itemsDelete = document.querySelectorAll('.deleteItem');
+
+for (let i = 0; i < itemsQuantity.length; i++){//(let i in itemsDelete){
+    itemsDelete[i].addEventListener('click', function(){ //p .deleteItem
+        let itemToBeDeleted = itemsDelete[i].closest('article');  //element.closest() ->target the element to change
+        let itemId = itemToBeDeleted.dataset.id;
+        let colorChosen = itemToBeDeleted.dataset.color;
     
+        cart = cart.filter(function(product){
+            if(itemId == product.id && colorChosen == product.color){
+                return false;
+            }
+            return true;
+        })
+        let el = document.querySelector(`[data-id="${product.id}"][data-color="${product.color}"]`);
+        el.remove();
+    
+        localStorage.setItem('cart', JSON.stringify(cart));
+        console.log(cart);
     //localStorage.removeItem(itemToBeDeleted);  //localStorage.clear(); ->all delete localStorage.removeItem('cart') .find ->trouver les items
-    console.log(cart)  
-});
-  
+    });
+}
 /*   
     let itemToBeDeleted = [];
     itemToBeDeleted = localStorage.getItem('cart', cart[0] == itemID && cart[2] == colorChosen); /*?????
