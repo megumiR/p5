@@ -90,14 +90,18 @@ function getPrice(){
     })    
     .then(function(products){  //le parametre entre() est le resultat de l'appel API = products info
         let itemsPrice = document.querySelectorAll('.productPrice');
+        console.log(itemsPrice);
         for (let i in itemsPrice){
             let itemPrice = document.querySelector('.productPrice').closest('article');
-            let itemId = itemPrice.dataset.id;
-            let colorChosen = itemPrice.dataset.color;
+            let itemId = itemPrice.dataset.id; 
+            console.log(itemId);  //->undefini
+           // let colorChosen = itemPrice.dataset.color;
 
                 for (let product of products){
-                    if(itemId == product.id && colorChosen == product.color){
+                    if(itemId == product._id){
+                        console.log(product.price);
                         document.getElementById('productPrice').textContent = product.price;
+                        
                     }
                 }
         }        
@@ -180,11 +184,16 @@ for (let i = 0; i < itemsQuantity.length; i++){//(let i in itemsDelete){
             }
             return true;
         })
-        let el = document.querySelector(`[data-id="${product.id}"][data-color="${product.color}"]`);
-        el.remove();
+        for (let product of cart){
+            let el = document.querySelector(`[data-id="${product.id}"][data-color="${product.color}"]`);
+            el.remove();
+        }
+        
     
         localStorage.setItem('cart', JSON.stringify(cart));
         console.log(cart);
+        
+        showTotalQuantitynPrice();
     //localStorage.removeItem(itemToBeDeleted);  //localStorage.clear(); ->all delete localStorage.removeItem('cart') .find ->trouver les items
     });
 }
@@ -207,8 +216,10 @@ for (let i = 0; i < itemsQuantity.length; i++){//(let i in itemsDelete){
 
  //etape 10 valider la commande -->local storage? here , its for etape11 POST request to show orderId in confirmation
 //passer une commande ,  La requête post ne prend pas encore en considération la quantité ni la couleur des produits achetés.
-async function sendForminfo(event){
-   await fetch('http://localhost:3000/api/products/order', {    //async await?????????
+//async 
+function sendForminfo(event){
+   //await 
+    fetch('http://localhost:3000/api/products/order', {    //async await?????????
         method: 'POST',
         headers: {
             'Accept': 'application/json',
