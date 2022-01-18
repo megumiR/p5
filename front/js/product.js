@@ -112,9 +112,9 @@ document.getElementById('addToCart').addEventListener('click',async function(){
         for (let product of cart){     
             if(product.id == itemId && product.color == colorChosen){ 
                 console.log(quantityChosen); 
-                product.quantity += parseInt(quantityChosen*1);    
+                product.quantity += parseInt(quantityChosen);    
                 isProductInCart = true; 
-                break;
+                break;                               //force to stop the closest for loop
             } 
         }
     } else {

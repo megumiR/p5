@@ -2,7 +2,8 @@
 // check if its null or not ??? json.parse we need to check null or not before parse it
 let cart = JSON.parse(localStorage.getItem('cart'));
 
-async function takeItemInLocalStorage(){
+//async 
+function takeItemInLocalStorage(){
     if(localStorage.getItem('cart') !== null){
         cart = JSON.parse(localStorage.getItem('cart'));
         console.log(cart);
@@ -10,44 +11,24 @@ async function takeItemInLocalStorage(){
         console.log(err);
     }
 }
-//creer la requete GET pour recuperer les info du produit 
-async function getPrice(){
-    fetch('http://localhost:3000/api/products',{
-        method: 'GET',       // for a GET request, we just write fetch(URL).then???? If there's no body , it seems fine
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(function(response){
-        if(response.ok){   //console.log(response.json()); to check
-        return response.json();
-        }
-    })    
-    .then(function(products){  //le parametre entre() est le resultat de l'appel API = products info
-        for (let product of products){
-            document.getElementById('productPrice').innerHTML = product.price + " €";
-        }
-    })
-    .catch(function(err){
-        console.log(err)
-    
-    });
-}
+
 //Creer des articles pour les produits selectionnes du cart
 //cart[0]=ID,[1]=QUANTITY,[2]=COLOR,[3]=IMGURL,[4]=ALTTXT,[5]=NAME,[6]=PRICE
-async function cartItemArt(){
-    await takeItemInLocalStorage();
-    await getPrice();
+//async 
+function cartItemArt(){
+    //await 
+    takeItemInLocalStorage();
+    //await 
+    getPrice();
     for (let product of cart){
         console.log(product.name); //it was id's 5th letter not as a 5th data String because of lack of JSON.parse
 
 /*Attention de ne pas dupliquer inutilement les éléments dans le
 tableau récapitulatif (le panier). S’il y a plusieurs produits identiques
 (même id + même couleur), cela ne doit donner lieu qu’à une seule
-ligne dans le tableau */
+ligne dans le tableau 
         
-  /*      function findDuplicatedItem(product) {
+        function findDuplicatedItem(product) {
             if(product.id == product[0] && product.color == product[2]){
                 let n = cart.indexOf(product.id);
                 let replaceItem = n -1;
@@ -69,38 +50,75 @@ ligne dans le tableau */
                   <div class="cart__item__content__description">
                     <h2>${product.name}</h2>
                     <p>${product.color}</p>
-                    <p id="productPrice">${product.price} €</p>
+                    <p><span class="productPrice" id="productPrice"></span> €</p>
                   </div>
                   <div class="cart__item__content__settings">
                     <div class="cart__item__content__settings__quantity">
                       <p>Qté : </p>
-                      <input type="number" class="itemQuantity" id=="itemQuantity" name="itemQuantity" min="1" max="100" value="${product[1]}">
+                      <input type="number" class="itemQuantity" id="itemQuantity" name="itemQuantity" min="1" max="100" value="${product.quantity}">
                     </div>
                     <div class="cart__item__content__settings__delete">
                       <p class="deleteItem">Supprimer</p>
                     </div>
                   </div>
                 </div>
-              </article> `
+              </article> `  //in span, there was ${product.price}
 
         document.getElementById('cart__items').appendChild(cartItemArticle); 
-    }
-    let quantityInput = document.getElementById('#itemQuantity');
+    } 
+/*    let quantityInput = document.getElementById('#itemQuantity');
     console.log(quantityInput);
     changeItemQuantity();
-
+*/
 };
 cartItemArt();
 
+//creer la requete GET pour recuperer les info du produit 
+//async 
+function getPrice(){
+    fetch('http://localhost:3000/api/products',{
+        method: 'GET',      
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(function(response){
+        if(response.ok){   
+        return response.json();
+        }
+    })    
+    .then(function(products){  //le parametre entre() est le resultat de l'appel API = products info
+        let itemsPrice = document.querySelectorAll('.productPrice');
+        for (let i in itemsPrice){
+            let itemPrice = document.querySelector('.productPrice').closest('article');
+            let itemId = itemPrice.dataset.id;
+            let colorChosen = itemPrice.dataset.color;
+
+                for (let product of products){
+                    if(itemId == product.id && colorChosen == product.color){
+                        document.getElementById('productPrice').textContent = product.price;
+                    }
+                }
+        }        
+    })
+    .catch(function(err){
+        console.log(err)
+    
+    });
+}
+
 //Counter la quantite totale et le prix total
-async function showTotalQuantitynPrice(){
+//async 
+function showTotalQuantitynPrice(){
    // await cartItemArt();  --> 2 articles become 4 -o-
 let totalQuantity = 0; 
 let totalPrice =0;
+let pricePerProduct =  document.getElementById('productPrice').value;
 
 for(let product of cart){
     totalQuantity += 1 * product.quantity;        ///on peut laisser la numero bizzare 1* ?
-    totalPrice += product.quantity * document.getElementById('productPrice').value;  ///??????? can i take the price like this? YES!!:)
+    totalPrice += product.quantity * parseInt(pricePerProduct);  ///??????? 
     console.log("The totalQuantity in cart is "+ totalQuantity, "The total price in cart is "+ totalPrice);
     }
 document.getElementById('totalQuantity').textContent = totalQuantity; 
@@ -137,7 +155,8 @@ showTotalQuantitynPrice();
         
             localStorage.setItem('cart', JSON.stringify(cart));
             console.log(cart);
-        
+            //calculate total quantity again
+            showTotalQuantitynPrice();
 });
     }
 //}
