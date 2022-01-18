@@ -92,16 +92,16 @@ function getPrice(){
         let itemsPrice = document.querySelectorAll('.productPrice');
         console.log(itemsPrice);
         for (let i in itemsPrice){
-            let itemPrice = document.querySelector('.productPrice').closest('article');
+            let itemPrice = itemsPrice[i].closest('article');
             let itemId = itemPrice.dataset.id; 
-            console.log(itemId);  //->undefini
+            console.log("itemId(data-id of article) is"+ itemId);  //->undefini
            // let colorChosen = itemPrice.dataset.color;
 
                 for (let product of products){
-                    if(itemId == product._id){
+                    if(product._id == itemId){
                         console.log(product.price);
-                        document.getElementById('productPrice').textContent = product.price;
-                        
+                        itemsPrice[i].textContent = product.price;
+                        break;
                     }
                 }
         }        
