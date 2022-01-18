@@ -14,12 +14,10 @@ function takeItemInLocalStorage(){
 
 //Creer des articles pour les produits selectionnes du cart
 //cart[0]=ID,[1]=QUANTITY,[2]=COLOR,[3]=IMGURL,[4]=ALTTXT,[5]=NAME,[6]=PRICE
-//async 
-function cartItemArt(){
+async function cartItemArt(){
     //await 
     takeItemInLocalStorage();
-    //await 
-    getPrice();
+    
     for (let product of cart){
         console.log(product.name); //it was id's 5th letter not as a 5th data String because of lack of JSON.parse
 
@@ -50,12 +48,12 @@ ligne dans le tableau
                   <div class="cart__item__content__description">
                     <h2>${product.name}</h2>
                     <p>${product.color}</p>
-                    <p><span class="productPrice" id="productPrice"></span> €</p>
+                    <p><span class="productPrice"></span> €</p>
                   </div>
                   <div class="cart__item__content__settings">
                     <div class="cart__item__content__settings__quantity">
                       <p>Qté : </p>
-                      <input type="number" class="itemQuantity" id="itemQuantity" name="itemQuantity" min="1" max="100" value="${product.quantity}">
+                      <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${product.quantity}">
                     </div>
                     <div class="cart__item__content__settings__delete">
                       <p class="deleteItem">Supprimer</p>
@@ -66,10 +64,7 @@ ligne dans le tableau
 
         document.getElementById('cart__items').appendChild(cartItemArticle); 
     } 
-/*    let quantityInput = document.getElementById('#itemQuantity');
-    console.log(quantityInput);
-    changeItemQuantity();
-*/
+    await getPrice();
 };
 cartItemArt();
 
@@ -89,13 +84,20 @@ function getPrice(){
         }
     })    
     .then(function(products){  //le parametre entre() est le resultat de l'appel API = products info
-        let itemsPrice = document.querySelectorAll('.productPrice');
+        for (let product of products) {
+            let elements = document.querySelectorAll(`[data-id="${product._id}"]`);
+            for (let element of elements){
+                let productPrice = element.querySelector('.productPrice');
+                productPrice.textContent = product.price;
+            }
+        }
+        showTotalQuantitynPrice();
+        /*        let itemsPrice = document.querySelectorAll('.productPrice');
         console.log(itemsPrice);
         for (let i in itemsPrice){
             let itemPrice = itemsPrice[i].closest('article');
             let itemId = itemPrice.dataset.id; 
-            console.log("itemId(data-id of article) is"+ itemId);  //->undefini
-           // let colorChosen = itemPrice.dataset.color;
+            console.log("itemId(data-id of article) is"+ itemId);  
 
                 for (let product of products){
                     if(product._id == itemId){
@@ -104,7 +106,7 @@ function getPrice(){
                         break;
                     }
                 }
-        }        
+        }       */
     })
     .catch(function(err){
         console.log(err)
@@ -115,29 +117,24 @@ function getPrice(){
 //Counter la quantite totale et le prix total
 //async 
 function showTotalQuantitynPrice(){
-   // await cartItemArt();  --> 2 articles become 4 -o-
-let totalQuantity = 0; 
-let totalPrice =0;
-let pricePerProduct =  document.getElementById('productPrice').value;
+   // await cartItemArt();  --> 2 articles become 4 -o-  
+    let totalQuantity = 0; 
+    let totalPrice =0;
+    let products =  document.querySelectorAll('article');
 
-for(let product of cart){
-    totalQuantity += 1 * product.quantity;        ///on peut laisser la numero bizzare 1* ?
-    totalPrice += product.quantity * parseInt(pricePerProduct);  ///??????? 
-    console.log("The totalQuantity in cart is "+ totalQuantity, "The total price in cart is "+ totalPrice);
-    }
-document.getElementById('totalQuantity').textContent = totalQuantity; 
-document.getElementById('totalPrice').textContent = totalPrice;
+    for(let product of products){
+        let productPrice = product.querySelector('.productPrice').textContent;
+        let productQuantity = product.querySelector('.itemQuantity').value;
+        
+        totalQuantity += parseInt(productQuantity);        ///on peut laisser la numero bizzare 1* ?
+        totalPrice += parseInt(productQuantity) * parseFloat(productPrice);  
+        console.log("The totalQuantity in cart is "+ totalQuantity, "The total price in cart is "+ totalPrice);
+        }
+    document.getElementById('totalQuantity').textContent = totalQuantity; 
+    document.getElementById('totalPrice').textContent = totalPrice;
 }
-showTotalQuantitynPrice();
+//showTotalQuantitynPrice();
 
-/*etape9 gerer la modif la suppression quantite-eventlistener'change'
-    la méthode Element.closest() devrait permettre de cibler le produit 
-    que vous souhaitez supprimer (où dont vous souhaitez modifier la quantité) 
-    grâce à son identifiant et sa couleur.
-     
-   var closestelement = element.closest('string --ex)p:hover, .toto + q'); 
-   if (closestelement == null){ 
-*/
 //Changement de quantite du produit
 //function changeItemQuantity(){
     const itemsQuantity = document.querySelectorAll('.itemQuantity');
@@ -184,10 +181,9 @@ for (let i = 0; i < itemsQuantity.length; i++){//(let i in itemsDelete){
             }
             return true;
         })
-        for (let product of cart){
-            let el = document.querySelector(`[data-id="${product.id}"][data-color="${product.color}"]`);
-            el.remove();
-        }
+        let el = document.querySelector(`[data-id="${itemId}"][data-color="${colorChosen}"]`);
+        el.remove(); //->remove always the first product on DOM but localstorage is ok...
+        
         
     
         localStorage.setItem('cart', JSON.stringify(cart));
@@ -212,72 +208,48 @@ for (let i = 0; i < itemsQuantity.length; i++){//(let i in itemsDelete){
         console.log('delete button is null');
     }
     */
-//THERE IS A LINE WHICH SHOWS TOTAL QUANTITY N TOTAL PRICE :LINE 74 cart,js -->line7?
 
- //etape 10 valider la commande -->local storage? here , its for etape11 POST request to show orderId in confirmation
-//passer une commande ,  La requête post ne prend pas encore en considération la quantité ni la couleur des produits achetés.
-//async 
-function sendForminfo(event){
-   //await 
-    fetch('http://localhost:3000/api/products/order', {    //async await?????????
-        method: 'POST',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(jsonBody) //({value: document.getElementById('').value})POSTで返された値をどこに置くか 
-    })
-        .then(function(response){
-            if(response.ok){
-                console.log(response.json());
-                //return response.json();
-            }
-        })
-        .then(function(value){  //send the info of formula
-            let orderIdInJson = JSON.parse(jsonBody);
-            console.log(JSON.stringify(jsonBody));  //orderId???  How can I get????
-            console.log(orderIdInJson);
-            document.querySelector(form .cart__order__form).setAttribute('action','confirmation.html');
-            document.getElementById('orderId').innerHTML = orderIdInJson;
 
-        })
-        .catch(function(err){
-            console.log(err)
-        });  
-    }
+
 /* Regex varifier    https://www.pierre-giraud.com/javascript-apprendre-coder-cours/regex-recherche-remplacement/
 let a = /[a-zA-Z]/g;    ----> g : global if there are more than 2 matches by string.match(a), with g they show 2 of them
 let b = new RegExp('[a-zA-Z]','g');  it is boolean so if there is no match, they return false 
 */
-let checkName = /[a-zA-Z]{2,}/g;
-let checkAddress = /^[\w.-]/g; // ^[A-Za-z0-9_.]+$   ^[\w.]+ ->azAZ09_ included []? )? ->can be with )
-let checkCity = /[a-zA-Z]{2,}/g;
-let checkEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/g;    
+let checkName = /^[a-zA-Z -]{2,}$/g;
+let checkAddress = /^[\w. -]+$/g; // ^[A-Za-z0-9_.]+$   ^[\w.]+ ->azAZ09_ included []? )? ->can be with ) + ou {1,}/ * ou {0,}
+let checkCity = /^[a-zA-Z -]{2,}$/g;
+let checkEmail = /^[\w. -]+@[\w. -]+\.[\w]{2,3}$/g;    
 //https://stackabuse.com/validate-email-addresses-with-regular-expressions-in-javascript/
 //  let regex = new RegExp("([!#-'*+/-9=?A-Z^-~-]+(\.[!#-'*+/-9=?A-Z^-~-]+)*|\"\(\[\]!#-[^-~ \t]|(\\[\t -~]))+\")@([!#-'*+/-9=?A-Z^-~-]+(\.[!#-'*+/-9=?A-Z^-~-]+)*|\[[\t -Z^-~]*])");
 
-/*let formCheckList = [[checkName, /[a-zA-Z]{2,}/g],[checkAddress, /[0-9][a-zA-Z]/g], [checkCity, /[a-zA-Z]{2,}/g], [checkEmail, /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/g]];
-let champ = ['#firstName', '#lastName',''];
-let errMsgId = [];
-let errMsg = [];
+/*let formCheckList = [checkName, checkAddress, checkAddress, checkCity, checkEmail];
+let champ = ['#firstName', '#lastName','#address', '#city', '#email'];
+let errMsgId = ['firstNameErrorMsg', 'lastNameErrorMsg', 'addressErrorMsg', 'cityErrorMsg', 'emailErrorMsg'];
+let errMsgName = ["Le prénom", "Le nom", "L'adresse", "Le nom de la ville", "L'adresse Email"];
+let errMsgReason = ["des caractères et '-'.", "des caractères et '-'.", "des caractères, des nombres et des caractères speciales '-', '.' et espace.",
+ "des caractères et '-'.", "les types d'e-mails. Ecrivez comme abc@xxx.xx"];
 
-let champs = document.querySelector(champ);
+let champs = document.querySelectorAll('.cart__order__form__question').closest(input);
+//let champs = document.querySelector(champ);
 champs.forEach(element => {
     element.addEventListener('input', function(event){
 
     });
 });
+
 */
+/*
 //for(let i in ?????????){
 document.querySelector('#firstName').addEventListener('input', function(event){
 //document.querySelector(champ[i]).addEventListener('input', function(event){
-    if(checkName.match(event.target.value) == false){  // boolean false = null = form is invalid .MATCH OR .TEST
+    let value = event.target.value;
+    if(value.match(checkName) == false){  // boolean false = null = form is invalid .MATCH OR .TEST
     //if(formCheckList[i].match(value) == false){     
-        document.getElementById('firstNameErrorMsg').innerHTML = 'Le prénom est invalide. Ce champ ne reçoit que des caractères.';
+        document.getElementById('firstNameErrorMsg').innerHTML = "Le prénom est invalide. Ce champ n'accepte que des caractères.";
     } else {
         console.log('Prénom valide')
     }
-});
+});*//*
 //}
 //repeat for all of the input
 document.querySelector('#lastName').addEventListener('input', function(event){
@@ -308,26 +280,85 @@ function b(){
         errMessages.classList.remove('hidden');
     }
 return a
-}
+}*/
 document.querySelector('#order').addEventListener('click', function(event){
-    
-    if(checkName.match(event.target.value) == true){ //All of input are valid = function 'sendForminfo' IF NOT errMsg / alert
+    event.preventDefault();
+
+    // vérifier les champs avec les regex
+    // faire une isOK = true
+    // a chaque vérification, si il y a une erreur, mettre isOK = false
+    let champs = [
+        {champId : "#firstName", regex : checkName, errMsgId : "firstNameErrorMsg", errMsgName : "Le prénom", errMsgReason : "des caractères et '-'."},
+        {champId : "#lastName", regex : checkName, errMsgId : "lastNameErrorMsg", errMsgName : "Le nom", errMsgReason : "des caractères et '-'."},
+        {champId : "#address", regex : checkAddress, errMsgId : "addressErrorMsg", errMsgName : "L'adresse", errMsgReason : "des caractères, des nombres et des caractères speciales '-', '.' et espace."},
+        {champId : "#city", regex : checkCity, errMsgId : "cityErrorMsg", errMsgName : "Le nom de la ville", errMsgReason : "des caractères et '-'."},
+        {champId : "#email", regex : checkEmail, errMsgId : "emailErrorMsg", errMsgName : "L'adresse Email", errMsgReason : "les types d'e-mails. Ecrivez comme abc@xxx.xx"}]; 
+    let isOk = false;
+
+    for (let element of champs){
+        //document.querySelector(element.champId).addEventListener('input', function(event){
+        //let value = event.target.value;
+        let value = document.querySelector(element.champId).value;
+        if(value.match(element.regex) == false){
+            isOk = false;
+            console.log("Invalid input in the form : "+ element.champId); 
+            document.getElementById(element.errMsgId)
+                .textContent = element.errMsgName + " est invalide. Ce champ n'accepte que " + element.errMsgReason;
+        } else {
+            isOk = true;
+        }
+    } 
+    // si isOK est true alors on envoie le formulaire
+
+    if(isOk = true){ //All of input are valid = function 'sendForminfo' IF NOT errMsg / alert
         sendForminfo();
-        
+        console.log("form is sent");
     } else {
-        event.preventDefault();
+        console.log(err);
         alert("Il y a d'info manqué!");
     }
 });
 
+ //etape 10 valider la commande -->local storage? here , its for etape11 POST request to show orderId in confirmation
+//passer une commande ,  La requête post ne prend pas encore en considération la quantité ni la couleur des produits achetés.
+//async 
+function sendForminfo(event){
+    //await 
+     fetch('http://localhost:3000/api/products/order', {    //async await?????????
+         method: 'POST',
+         headers: {
+             'Accept': 'application/json',
+             'Content-Type': 'application/json'
+         },
+         body: JSON.stringify(jsonBody) //({value: document.getElementById('').value})POSTで返された値をどこに置くか 
+     })
+         .then(function(response){
+             if(response.ok){
+                 console.log(response.json());
+                 //return response.json();
+             }
+         })
+         .then(function(value){  //send the info of formula
+             let orderIdInJson = JSON.parse(jsonBody);
+             console.log(JSON.stringify(jsonBody));  //orderId???  How can I get????
+             console.log(orderIdInJson);
+             document.querySelector(form .cart__order__form).setAttribute('action','confirmation.html');
+             document.getElementById('orderId').innerHTML = orderIdInJson;
+ 
+         })
+         .catch(function(err){
+             console.log(err)
+         });  
+     }
 //document.querySelector('#order').addEventListener('click', sendForminfo);
+
 
 /*etape11   take the command ID by POST request 
             affichier le numero de command sur confirmation.html (addEventlistener - innerHtML )
     */
 
 /*QUESTIONS
-    totalQuantity += 1 * product[1];        ///on peut laisser la numero bizzare 1* ?
+    
 
     document.querySelector('input .itemQuantity'); //we see the value but it's null so function doesnt work
 
@@ -342,5 +373,5 @@ document.querySelector('#order').addEventListener('click', function(event){
     line208: i dont  know what i should put in if()
     line160:let checkAddress = /^[\w.-]/g;  need to change n check
     
-    same color,same id -> change the quantity n dont show them separately
-            */
+    same color,same id -> change the quantity n dont show them separately*/
+

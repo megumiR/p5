@@ -123,7 +123,7 @@ document.getElementById('addToCart').addEventListener('click',async function(){
     if(!isProductInCart){
         cart.push({
             id : itemId, 
-            quantity: quantityChosen, 
+            quantity: parseInt(quantityChosen), 
             color: colorChosen, 
             imgUrl: itemImgUrl, 
             altTxt: itemAltTxt, 
@@ -141,5 +141,3 @@ document.getElementById('addToCart').addEventListener('click',async function(){
     }
     console.log(cart);
 })
-
-// Line 115: 同色同型の追加注文: 注文個数追加ができてない
