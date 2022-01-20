@@ -216,6 +216,7 @@ let a = /[a-zA-Z]/g;    ----> g : global if there are more than 2 matches by str
 let b = new RegExp('[a-zA-Z]','g');  it is boolean so if there is no match, they return false 
 */
 let checkName = /^[a-zA-Z -]{2,}$/g;
+let checkFamilyName = /^[a-zA-Z -]{2,}$/g;
 let checkAddress = /^[\w. -]+$/g; // ^[A-Za-z0-9_.]+$   ^[\w.]+ ->azAZ09_ included []? )? ->can be with ) + ou {1,}/ * ou {0,}
 let checkCity = /^[a-zA-Z -]{2,}$/g;
 let checkEmail = /^[\w. -]+@[\w. -]+\.[\w]{2,3}$/g;    
@@ -249,80 +250,64 @@ document.querySelector('#firstName').addEventListener('input', function(event){
     } else {
         console.log('Prénom valide')
     }
-});*//*
+});*/
 //}
-//repeat for all of the input
-document.querySelector('#lastName').addEventListener('input', function(event){
-    if(checkName.match(event.target.value) == false){    
-        document.getElementById('lastNameErrorMsg').innerHTML = 'Le nom est invalide. Ce champ ne reçoit que des caractères.';
-    }
-});
-document.querySelector('#address').addEventListener('input', function(event){
-    if(checkAddress.match(event.target.value) == false){    
-        document.getElementById('addressErrorMsg').innerHTML = "L'adresse est invalide. Ce champ ne reçoit que des caractères, des nombres et '-'.";
-    }
-});
-document.querySelector('#city').addEventListener('input', function(event){
-    if(checkCity.match(event.target.value) == false){    
-        document.getElementById('cityErrorMsg').innerHTML = "Le nom de la ville est invalide. Ce champ ne reçoit que des caractères.";
-    }
-});
-document.querySelector('#email').addEventListener('input', function(event){
-    if(checkEmail.match(event.target.value) == false){    
-        document.getElementById('emailErrorMsg').innerHTML = "L'adresse Email est invalide. Ecrivez comme abc@xxx.xx";
-    }
-});
-function b(){
-    const a = input.value === xxx
-    if(a){
-        errMessages.classList.add('hidden');
-    } else{
-        errMessages.classList.remove('hidden');
-    }
-return a
-}*/
+
 document.querySelector('#order').addEventListener('click', function(event){
     event.preventDefault();
 
     // vérifier les champs avec les regex
     // faire une isOK = true
     // a chaque vérification, si il y a une erreur, mettre isOK = false
-    let champs = [
+    const champs = [
         {champId : "#firstName", regex : checkName, errMsgId : "firstNameErrorMsg", errMsgName : "Le prénom", errMsgReason : "des caractères et '-'."},
-        {champId : "#lastName", regex : checkName, errMsgId : "lastNameErrorMsg", errMsgName : "Le nom", errMsgReason : "des caractères et '-'."},
+        {champId : "#lastName", regex : checkFamilyName, errMsgId : "lastNameErrorMsg", errMsgName : "Le nom", errMsgReason : "des caractères et '-'."},
         {champId : "#address", regex : checkAddress, errMsgId : "addressErrorMsg", errMsgName : "L'adresse", errMsgReason : "des caractères, des nombres et des caractères speciales '-', '.' et espace."},
         {champId : "#city", regex : checkCity, errMsgId : "cityErrorMsg", errMsgName : "Le nom de la ville", errMsgReason : "des caractères et '-'."},
         {champId : "#email", regex : checkEmail, errMsgId : "emailErrorMsg", errMsgName : "L'adresse Email", errMsgReason : "les types d'e-mails. Ecrivez comme abc@xxx.xx"}]; 
     let isOk = false;
 
     for (let element of champs){
-        //document.querySelector(element.champId).addEventListener('input', function(event){
-        //let value = event.target.value;
+        console.log(element.champId);
         let value = document.querySelector(element.champId).value;
-        if(value.match(element.regex) == false){
+        if(element.regex.test(value)){  
+            isOk = true;
+            console.log(element.champId + " : "+ value +" is valid");
+        } else {
             isOk = false;
-            console.log("Invalid input in the form : "+ element.champId); 
+            console.log(""+ value +" exsists but doesn't much our regex");
             document.getElementById(element.errMsgId)
                 .textContent = element.errMsgName + " est invalide. Ce champ n'accepte que " + element.errMsgReason;
-        } else {
-            isOk = true;
         }
-    } 
+    }
+
+/*Marche pas    champs.forEach(element => {
+        let value = document.querySelector(element.champId).value;
+        console.log("The value is: "+ value +", the regex for this value is: "+ element.regex );
+        if(element.regex.test(value)){  //        if(value.match(element.regex) == true){
+            isOk = true;
+            console.log(element.champId + " : "+ value +"is valid");
+        } else {
+            isOk = false;
+            console.log(""+ value +" exsists but doesn't much our regex");
+            document.getElementById(element.errMsgId)
+                .textContent = element.errMsgName + " est invalide. Ce champ n'accepte que " + element.errMsgReason;
+        }    
+    });*/
+    
     // si isOK est true alors on envoie le formulaire
 
-    if(isOk = true){ //All of input are valid = function 'sendForminfo' IF NOT errMsg / alert
+    if(isOk = true){   //All of input are valid = function 'sendForminfo' 
         sendForminfo();
         console.log("form is sent");
-    } else {
-        console.log(err);
-        alert("Il y a d'info manqué!");
+    } else {        
     }
 });
 
  //etape 10 valider la commande -->local storage? here , its for etape11 POST request to show orderId in confirmation
 //passer une commande ,  La requête post ne prend pas encore en considération la quantité ni la couleur des produits achetés.
 //async 
-function sendForminfo(event){
+function sendForminfo(){
     //await 
      fetch('http://localhost:3000/api/products/order', {    //async await?????????
          method: 'POST',
@@ -330,7 +315,7 @@ function sendForminfo(event){
              'Accept': 'application/json',
              'Content-Type': 'application/json'
          },
-         body: JSON.stringify(jsonBody) //({value: document.getElementById('').value})POSTで返された値をどこに置くか 
+         body: JSON.stringify({value: document.getElementById('orderId').value}) //(jsonBody)?({value: document.getElementById('').value})POSTで返された値をどこに置くか 
      })
          .then(function(response){
              if(response.ok){
@@ -343,13 +328,18 @@ function sendForminfo(event){
              console.log(JSON.stringify(jsonBody));  //orderId???  How can I get????
              console.log(orderIdInJson);
              document.querySelector(form .cart__order__form).setAttribute('action','confirmation.html');
-             document.getElementById('orderId').innerHTML = orderIdInJson;
+             //let form = document.querySelector(form .cart__order__form);
+             //form.action = "confirmation.html"; form.method = "POST";  form.submit();
+             //document.forms["myform"].submit();
+             //.target -> send the result to the place you wanna put
+             //.method -> show the method you use for sending the form
+         //    document.getElementById('orderId').textContent = orderIdInJson;
  
          })
          .catch(function(err){
              console.log(err)
          });  
-     }
+}
 //document.querySelector('#order').addEventListener('click', sendForminfo);
 
 
@@ -360,18 +350,15 @@ function sendForminfo(event){
 /*QUESTIONS
     
 
-    document.querySelector('input .itemQuantity'); //we see the value but it's null so function doesnt work
 
     line134: const orderIdInJson = JSON.parse(jsonBody);
             console.log(JSON.stringify(jsonBody));  //orderId???  How can I get????
             console.log(orderIdInJson);
-    line81-: 
-    document.getElementById('totalQuantity').innerHTML = ; 
-    document.getElementById('totalPrice').innerHTML = ;
-    //with for we count? sum of quantity n price
+    
 
     line208: i dont  know what i should put in if()
-    line160:let checkAddress = /^[\w.-]/g;  need to change n check
-    
-    same color,same id -> change the quantity n dont show them separately*/
 
+
+    CSS selector: https://developer.mozilla.org/fr/docs/Web/CSS/Attribute_selectors
+    to submit formkkk : https://developer.mozilla.org/fr/docs/Web/API/HTMLFormElement/submit
+    */
