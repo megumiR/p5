@@ -260,27 +260,41 @@ document.querySelector('#order').addEventListener('click', function(event){
     // faire une isOK = true
     // a chaque vérification, si il y a une erreur, mettre isOK = false
     const champs = [
-        {champId : "#firstName", regex : checkName, errMsgId : "firstNameErrorMsg", errMsgName : "Le prénom", errMsgReason : "des caractères et '-'."},
-        {champId : "#lastName", regex : checkFamilyName, errMsgId : "lastNameErrorMsg", errMsgName : "Le nom", errMsgReason : "des caractères et '-'."},
-        {champId : "#address", regex : checkAddress, errMsgId : "addressErrorMsg", errMsgName : "L'adresse", errMsgReason : "des caractères, des nombres et des caractères speciales '-', '.' et espace."},
-        {champId : "#city", regex : checkCity, errMsgId : "cityErrorMsg", errMsgName : "Le nom de la ville", errMsgReason : "des caractères et '-'."},
-        {champId : "#email", regex : checkEmail, errMsgId : "emailErrorMsg", errMsgName : "L'adresse Email", errMsgReason : "les types d'e-mails. Ecrivez comme abc@xxx.xx"}]; 
+        {champId : "#firstName", regex : checkName, errMsgId : "firstNameErrorMsg", errMsgName : "Le prénom", errMsgReason : "des caractères et '-'.", locoName : "firstName"},
+        {champId : "#lastName", regex : checkFamilyName, errMsgId : "lastNameErrorMsg", errMsgName : "Le nom", errMsgReason : "des caractères et '-'.", locoName : "lastName"},
+        {champId : "#address", regex : checkAddress, errMsgId : "addressErrorMsg", errMsgName : "L'adresse", errMsgReason : "des caractères, des nombres et des caractères speciales '-', '.' et espace." , locoName : "address"},
+        {champId : "#city", regex : checkCity, errMsgId : "cityErrorMsg", errMsgName : "Le nom de la ville", errMsgReason : "des caractères et '-'." , locoName : "city"},
+        {champId : "#email", regex : checkEmail, errMsgId : "emailErrorMsg", errMsgName : "L'adresse Email", errMsgReason : "les types d'e-mails. Ecrivez comme abc@xxx.xx" , locoName : "email"}]; 
     let isOk = false;
 
-    for (let element of champs){
-        console.log(element.champId);
-        let value = document.querySelector(element.champId).value;
-        if(element.regex.test(value)){  
-            isOk = true;
-            console.log(element.champId + " : "+ value +" is valid");
-        } else {
-            isOk = false;
-            console.log(""+ value +" exsists but doesn't much our regex");
-            document.getElementById(element.errMsgId)
-                .textContent = element.errMsgName + " est invalide. Ce champ n'accepte que " + element.errMsgReason;
-        }
+    let form = JSON.parse(localStorage.getItem('form'));
+    if(form){
+            for (let element of champs){
+                console.log(element.champId);
+                let value = document.querySelector(element.champId).value;
+                if(element.regex.test(value)){  
+                    isOk = true;
+                    console.log(element.champId + " : "+ value +" is valid");
+                    form.push({[element.locoName] : 'true' });
+                } else {
+                    isOk = false;
+                    console.log(""+ value +" exsists but doesn't much our regex");
+                    document.getElementById(element.errMsgId)
+                        .textContent = element.errMsgName + " est invalide. Ce champ n'accepte que " + element.errMsgReason;
+                    form;
+                    }
+            }
+    } else {
+        form = [];
     }
 
+    try{
+        localStorage.clear();
+        localStorage.setItem('form', JSON.stringify(form));
+        } catch(err){    //en cas d'espace manqué sur localstorage
+            console.log(err)
+        }
+        console.log(form);
 /*Marche pas    champs.forEach(element => {
         let value = document.querySelector(element.champId).value;
         console.log("The value is: "+ value +", the regex for this value is: "+ element.regex );
@@ -294,15 +308,20 @@ document.querySelector('#order').addEventListener('click', function(event){
                 .textContent = element.errMsgName + " est invalide. Ce champ n'accepte que " + element.errMsgReason;
         }    
     });*/
-    
+
     // si isOK est true alors on envoie le formulaire
 
-    if(isOk = true){   //All of input are valid = function 'sendForminfo' 
+    if (form.firstName == 'true' 
+        && form.lastName == 'true' 
+        && form.address == 'true' 
+        && form.city == 'true' 
+        && form.email == 'true'){   //All of input are valid = function 'sendForminfo' 
         sendForminfo();
         console.log("form is sent");
     } else {        
+        alert("form has not sent.");
     }
-});
+});  
 
  //etape 10 valider la commande -->local storage? here , its for etape11 POST request to show orderId in confirmation
 //passer une commande ,  La requête post ne prend pas encore en considération la quantité ni la couleur des produits achetés.
