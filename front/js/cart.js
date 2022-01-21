@@ -265,7 +265,7 @@ document.querySelector('#order').addEventListener('click', function(event){
         {champId : "#address", regex : checkAddress, errMsgId : "addressErrorMsg", errMsgName : "L'adresse", errMsgReason : "des caractères, des nombres et des caractères speciales '-', '.' et espace." , locoName : "address"},
         {champId : "#city", regex : checkCity, errMsgId : "cityErrorMsg", errMsgName : "Le nom de la ville", errMsgReason : "des caractères et '-'." , locoName : "city"},
         {champId : "#email", regex : checkEmail, errMsgId : "emailErrorMsg", errMsgName : "L'adresse Email", errMsgReason : "les types d'e-mails. Ecrivez comme abc@xxx.xx" , locoName : "email"}]; 
-    let isOk = false;
+  //  let isOk = false;
 
     let form = JSON.parse(sessionStorage.getItem('form'));
     sessionStorage.clear();
@@ -275,11 +275,11 @@ document.querySelector('#order').addEventListener('click', function(event){
                // console.log(element.champId);
                 let value = document.querySelector(element.champId).value;
                 if(element.regex.test(value)){  
-                    isOk = true;
+             //       isOk = true;
                     console.log(element.champId + " : "+ value +" is valid");
                     form.push({[element.locoName] : 'true' });
                 } else {
-                    isOk = false;
+              //      isOk = false;
                     console.log(""+ value +" exsists but doesn't much our regex");
                     document.getElementById(element.errMsgId)
                         .textContent = element.errMsgName + " est invalide. Ce champ n'accepte que " + element.errMsgReason;
@@ -311,8 +311,10 @@ document.querySelector('#order').addEventListener('click', function(event){
 
     // si isOK est true alors on envoie le formulaire
     const formValidation = [{firstName : 'true'}, {lastName: 'true'}, {address: 'true'}, {city: 'true'}, {email: 'true'}];
-    
-        if (form == formValidation){   //All of input are valid = function 'sendForminfo' 
+   // let result = (form.length === formValidation.length) && (formValidation.every(champ => form.includes(champ)));   NE MARCHE PAS
+    let result = JSON.stringify(form.concat().sort()) === JSON.stringify(formValidation.concat().sort()); //https://the-zombis.sakurane.jp/wp/blog/2019/11/24/post-4114/ web.fla check js arrays are the same or not.
+
+    if (result){   //All of input are valid = function 'sendForminfo' 
         sendForminfo();
         console.log("form is sent");
     } else {        
