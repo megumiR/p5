@@ -75,10 +75,10 @@ function requestGet(){
                 productImage.setAttribute('src', product.imageUrl);
                 productImage.setAttribute('alt', product.altTxt);
             let productName = document.createElement('h3');
-                productName.innerHTML = product.name;  //also Line83, innerHTML ->textContent if possible to avoid bugs 
+                productName.textContent = product.name;  //also Line83, innerHTML ->textContent if possible to avoid bugs 
                 productName.classList.add('productName');
             let productDescription = document.createElement('p');
-                productDescription.innerHTML = product.description;
+                productDescription.textContent = product.description;
                 productDescription.classList.add('productDescription');
 
             let newItem = document.createElement('article');

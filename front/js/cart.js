@@ -267,10 +267,12 @@ document.querySelector('#order').addEventListener('click', function(event){
         {champId : "#email", regex : checkEmail, errMsgId : "emailErrorMsg", errMsgName : "L'adresse Email", errMsgReason : "les types d'e-mails. Ecrivez comme abc@xxx.xx" , locoName : "email"}]; 
     let isOk = false;
 
-    let form = JSON.parse(localStorage.getItem('form'));
-    if(form){
+    let form = JSON.parse(sessionStorage.getItem('form'));
+    sessionStorage.clear();
+    form = [];
+  //  if(form){                                                      2eme tour , ca rutourne false pour true
             for (let element of champs){
-                console.log(element.champId);
+               // console.log(element.champId);
                 let value = document.querySelector(element.champId).value;
                 if(element.regex.test(value)){  
                     isOk = true;
@@ -284,13 +286,11 @@ document.querySelector('#order').addEventListener('click', function(event){
                     form;
                     }
             }
-    } else {
-        form = [];
-    }
+   // } 
 
     try{
-        localStorage.clear();
-        localStorage.setItem('form', JSON.stringify(form));
+       // localStorage.clear();
+       sessionStorage.setItem('form', JSON.stringify(form));
         } catch(err){    //en cas d'espace manqué sur localstorage
             console.log(err)
         }
@@ -310,12 +310,9 @@ document.querySelector('#order').addEventListener('click', function(event){
     });*/
 
     // si isOK est true alors on envoie le formulaire
-
-    if (form.firstName == 'true' 
-        && form.lastName == 'true' 
-        && form.address == 'true' 
-        && form.city == 'true' 
-        && form.email == 'true'){   //All of input are valid = function 'sendForminfo' 
+    const formValidation = [{firstName : 'true'}, {lastName: 'true'}, {address: 'true'}, {city: 'true'}, {email: 'true'}];
+    
+        if (form == formValidation){   //All of input are valid = function 'sendForminfo' 
         sendForminfo();
         console.log("form is sent");
     } else {        
