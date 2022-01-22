@@ -136,7 +136,7 @@ function showTotalQuantitynPrice(){
 //showTotalQuantitynPrice();
 
 //Changement de quantite du produit
-//function changeItemQuantity(){
+
     const itemsQuantity = document.querySelectorAll('.itemQuantity');
 
     for (let i = 0; i < itemsQuantity.length; i++){//(let i in itemsQuantity){
@@ -160,7 +160,7 @@ function showTotalQuantitynPrice(){
             showTotalQuantitynPrice();
 });
     }
-//}
+
 
     //.find or .indexOf https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf
     //OR .splice https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/Array/splice
@@ -310,6 +310,7 @@ document.querySelector('#order').addEventListener('click', function(event){
     });*/
 
     // si isOK est true alors on envoie le formulaire
+    
     const formValidation = [{firstName : 'true'}, {lastName: 'true'}, {address: 'true'}, {city: 'true'}, {email: 'true'}];
    // let result = (form.length === formValidation.length) && (formValidation.every(champ => form.includes(champ)));   NE MARCHE PAS
     let result = JSON.stringify(form.concat().sort()) === JSON.stringify(formValidation.concat().sort()); //https://the-zombis.sakurane.jp/wp/blog/2019/11/24/post-4114/ web.fla check js arrays are the same or not.
@@ -326,37 +327,59 @@ document.querySelector('#order').addEventListener('click', function(event){
 //passer une commande ,  La requête post ne prend pas encore en considération la quantité ni la couleur des produits achetés.
 //async 
 function sendForminfo(){
+    let newOrder = 
+                [{firstName : document.getElementById('firstName').value}, 
+                {lastName: document.getElementById('lastName').value}, 
+                {address: document.getElementById('address').value}, 
+                {city: document.getElementById('city').value}, 
+                {email: document.getElementById('email').value},
+                cart];
+    console.log(newOrder);
+    let url = 'http://localhost:3000/api/products/order'; // 400 bad request????  
     //await 
-     fetch('http://localhost:3000/api/products/order', {    //async await?????????
-         method: 'POST',
-         headers: {
-             'Accept': 'application/json',
-             'Content-Type': 'application/json'
-         },
-         body: JSON.stringify({value: document.getElementById('orderId').value}) //(jsonBody)?({value: document.getElementById('').value})POSTで返された値をどこに置くか 
-     })
-         .then(function(response){
-             if(response.ok){
-                 console.log(response.json());
-                 //return response.json();
-             }
-         })
-         .then(function(value){  //send the info of formula
-             let orderIdInJson = JSON.parse(jsonBody);
-             console.log(JSON.stringify(jsonBody));  //orderId???  How can I get????
-             console.log(orderIdInJson);
-             document.querySelector(form .cart__order__form).setAttribute('action','confirmation.html');
-             //let form = document.querySelector(form .cart__order__form);
-             //form.action = "confirmation.html"; form.method = "POST";  form.submit();
-             //document.forms["myform"].submit();
-             //.target -> send the result to the place you wanna put
-             //.method -> show the method you use for sending the form
-         //    document.getElementById('orderId').textContent = orderIdInJson;
+    fetch(url, {    
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newOrder) //donee qu on souhaite envoyer(jsonBody)({value: document.getElementById('').value})POSTで返された値をどこに置くか 
+    })
+        .then(async function(response){
+            try{
+                console.log(response);
+                const content = await response.json();
+                let contentObjecct = JSON.stringify(content);
+                console.log(contentObjecct);
+            } catch(err){
+                console.log(err);
+            }
+        })
+     /*   .then(function(response){
+            if(response.ok){
+                console.log(response.json());
+                return response.json();
+            }
+        }) */
+        
+        .then(function(value){  //send the info of formula
+          //  let orderId= JSON.parse(orderIdCustomerInfo);
+     //       console.log(newOrder);  //orderId???  How can I get???? by postData.text?
+         
+        //    document.querySelector(form .cart__order__form).setAttribute('action','confirmation.html');
+   /*         document.querySelector(form .cart__order__form)
+                .action = "confirmation.html"; 
+            document.querySelector(form .cart__order__form)
+                .method = "POST";  
+            document.querySelector(form .cart__order__form)
+                .submit();*/
+            //document.forms["myform"].submit();    .target-> send the result to the place you wanna put    .method -> show the method you use for sending the form
+            document.getElementById('orderId').innerText = value.postData.text;
  
-         })
-         .catch(function(err){
-             console.log(err)
-         });  
+        })
+        .catch(function(err){
+            console.log(err)
+        });   
 }
 //document.querySelector('#order').addEventListener('click', sendForminfo);
 
