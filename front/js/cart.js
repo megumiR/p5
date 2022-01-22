@@ -327,7 +327,7 @@ document.querySelector('#order').addEventListener('click', function(event){
 //passer une commande ,  La requête post ne prend pas encore en considération la quantité ni la couleur des produits achetés.
 //async 
 function sendForminfo(){
-    let newOrder = 
+    let newOrder =  //peut-etre ce n'est pas la bon structure...back>controllers>productjs line 49-56
                 [{firstName : document.getElementById('firstName').value}, 
                 {lastName: document.getElementById('lastName').value}, 
                 {address: document.getElementById('address').value}, 
@@ -345,7 +345,7 @@ function sendForminfo(){
         },
         body: JSON.stringify(newOrder) //donee qu on souhaite envoyer(jsonBody)({value: document.getElementById('').value})POSTで返された値をどこに置くか 
     })
-        .then(async function(response){
+      /*  .then(async function(response){
             try{
                 console.log(response);
                 const content = await response.json();
@@ -354,22 +354,27 @@ function sendForminfo(){
             } catch(err){
                 console.log(err);
             }
-        })
-     /*   .then(function(response){
+        })  */
+        .then(function(response){
             if(response.ok){
                 console.log(response.json());
+                let res = JSON.stringify(response.json());
+                console.log("response.json is : "+ res);
+
                 return response.json();
             }
-        }) */
+        }) 
         
         .then(function(value){  //send the info of formula
+            console.log(value.orderId);
           //  let orderId= JSON.parse(orderIdCustomerInfo);
      //       console.log(newOrder);  //orderId???  How can I get???? by postData.text?
          
         //    document.querySelector(form .cart__order__form).setAttribute('action','confirmation.html');
-   /*         document.querySelector(form .cart__order__form)
-                .action = "confirmation.html"; 
+            let urlConfirmation =  'http://localhost:3000/api/products/'; 
             document.querySelector(form .cart__order__form)
+                .action = urlConfirmation + orderId;                  //which url? this page(document.location.search)? 'http://localhost:3000/api/products/' ?
+        /*    document.querySelector(form .cart__order__form)
                 .method = "POST";  
             document.querySelector(form .cart__order__form)
                 .submit();*/
