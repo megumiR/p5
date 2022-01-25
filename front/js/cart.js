@@ -1,8 +1,123 @@
-// recuperer l'array via localstorage
-// check if its null or not ??? json.parse we need to check null or not before parse it
+let search_params = new URLSearchParams(document.location.search); //document.location.search = URL de cette page
+let orderId = search_params.get('orderId');
 let cart = JSON.parse(localStorage.getItem('cart'));
 
-//async 
+if (orderId) {
+    document.getElementById('orderId').innerText = orderId;
+} else {
+    cartItemArt();
+
+    
+/********************************** changer la quantité du produit **************************************************************/
+const itemsQuantity = document.querySelectorAll('.itemQuantity');
+
+for (let i = 0; i < itemsQuantity.length; i++){
+    itemsQuantity[i].addEventListener('change', function(){  
+    let itemToBeModified = itemsQuantity[i].closest('article');
+    let itemId = itemToBeModified.dataset.id;
+    let colorChosen = itemToBeModified.dataset.color;
+//si l'utilisateur change la quantité du produit qui a le meme id et la meme couleur          
+    for (let product of cart){       
+        if(product.id == itemId && product.color == colorChosen){ 
+            product.quantity = parseInt(this.value);
+            } 
+    }        
+    localStorage.setItem('cart', JSON.stringify(cart));
+    console.log(cart);
+//conter la quantité totale encore une fois
+    showTotalQuantitynPrice();
+});
+}
+/********************************** FIN : changer la quantité du produit **************************************************************/
+
+
+/********************************** effacer un produit dans le panier ******************************************************************* */
+const itemsDelete = document.querySelectorAll('.deleteItem');
+
+for (let i = 0; i < itemsQuantity.length; i++){
+    itemsDelete[i].addEventListener('click', function(){ 
+    let itemToBeDeleted = itemsDelete[i].closest('article');  //element.closest() ->target the element to change
+    let itemId = itemToBeDeleted.dataset.id;
+    let colorChosen = itemToBeDeleted.dataset.color;
+// trouver le produit selectionné dans le panier    
+    cart = cart.filter(function(product){
+    if(itemId == product.id && colorChosen == product.color){
+        return false;
+        }
+        return true;
+    })
+    let el = document.querySelector(`[data-id="${itemId}"][data-color="${colorChosen}"]`);
+    el.remove(); 
+            
+    localStorage.setItem('cart', JSON.stringify(cart));
+//conter la quantité totale encore une fois        
+    showTotalQuantitynPrice();
+});
+}
+/********************************** FIN : effacer un produit dans le panier ******************************************************************* */
+
+
+/********************************** verifier les champs avec les regex et renvoyer le message d'erreur en cas d'erreur *******************************************************************/
+  
+
+document.querySelector('#order').addEventListener('click', function(event){
+    event.preventDefault();
+    let checkName = /^[a-zA-Z -]{2,}$/g;
+    let checkFamilyName = /^[a-zA-Z -]{2,}$/g;
+    let checkAddress = /^[\w. -]+$/g; // ^[A-Za-z0-9_.]+$   ^[\w.]+ ->azAZ09_ included []? )? ->can be with ) + ou {1,}/ * ou {0,}
+    let checkCity = /^[a-zA-Z -]{2,}$/g;
+    let checkEmail = /^[\w. -]+@[\w. -]+\.[\w]{2,3}$/g;  
+    const champs = [
+        {champId : "#firstName", regex : checkName, errMsgId : "firstNameErrorMsg", errMsgName : "Le prénom", errMsgReason : "des caractères et '-'.", locoName : "firstName"},
+        {champId : "#lastName", regex : checkFamilyName, errMsgId : "lastNameErrorMsg", errMsgName : "Le nom", errMsgReason : "des caractères et '-'.", locoName : "lastName"},
+        {champId : "#address", regex : checkAddress, errMsgId : "addressErrorMsg", errMsgName : "L'adresse", errMsgReason : "des caractères, des nombres et des caractères speciales '-', '.' et espace." , locoName : "address"},
+        {champId : "#city", regex : checkCity, errMsgId : "cityErrorMsg", errMsgName : "Le nom de la ville", errMsgReason : "des caractères et '-'." , locoName : "city"},
+        {champId : "#email", regex : checkEmail, errMsgId : "emailErrorMsg", errMsgName : "L'adresse Email", errMsgReason : "les types d'e-mails. Ecrivez comme abc@xxx.xx" , locoName : "email"}]; 
+  
+    let form = [];
+
+    for (let element of champs){
+        let value = document.querySelector(element.champId).value;
+        if(value.match(element.regex)){  
+            console.log(element.champId + " : "+ value +" is valid");
+            form.push({[element.locoName] : 'true' });
+            document.getElementById(element.errMsgId).textContent = null; 
+        } else {
+            console.log(""+ value +" exsists but doesn't much our regex");
+            document.getElementById(element.errMsgId).textContent = element.errMsgName + " est invalide. Ce champ n'accepte que " + element.errMsgReason;
+            form.push({[element.locoName]: 'false'}); //to show false as false
+        }
+    }
+    try{
+       sessionStorage.setItem('form', JSON.stringify(form));
+        } catch(err){    
+//en cas d'espace manqué sur localstorage
+            console.log(err)
+        }
+        console.log(form);
+
+// si tout les chapms est validé(true), on envoie le formulaire avec la function 'sendForminfo'
+    const formValidation = [{firstName : 'true'}, {lastName: 'true'}, {address: 'true'}, {city: 'true'}, {email: 'true'}];
+    let result = JSON.stringify(form.concat().sort()) === JSON.stringify(formValidation.concat().sort()); 
+
+    if (result){   
+        sendForminfo();
+        console.log("form is sent");
+    } else {        
+        alert("form has not sent.");
+    }
+});  
+
+/********************************** FIN : verifier les champs avec les regex et renvoyer le message d'erreur en cas d'erreur *******************************************************************/
+
+}
+
+
+
+
+
+/*************************** recuperer l'array via localstorage **************************/
+// verifier s'il est null avant JSON.parse 
 function takeItemInLocalStorage(){
     if(localStorage.getItem('cart') !== null){
         cart = JSON.parse(localStorage.getItem('cart'));
@@ -12,34 +127,18 @@ function takeItemInLocalStorage(){
     }
 }
 
-//Creer des articles pour les produits selectionnes du cart
-//cart[0]=ID,[1]=QUANTITY,[2]=COLOR,[3]=IMGURL,[4]=ALTTXT,[5]=NAME,[6]=PRICE
+/*************************** FIN : recuperer l'array via localstorage **************************/
+
+
+/****************************** creer des articles pour les produits selectionnes du cart *****************************/
 async function cartItemArt(){
-    //await 
+// recuperer l'info du panier     
     takeItemInLocalStorage();
     
+// affichier tout les produits du panier    
     for (let product of cart){
-        console.log(product.name); //it was id's 5th letter not as a 5th data String because of lack of JSON.parse
-
-/*Attention de ne pas dupliquer inutilement les éléments dans le
-tableau récapitulatif (le panier). S’il y a plusieurs produits identiques
-(même id + même couleur), cela ne doit donner lieu qu’à une seule
-ligne dans le tableau 
-        
-        function findDuplicatedItem(product) {
-            if(product.id == product[0] && product.color == product[2]){
-                let n = cart.indexOf(product.id);
-                let replaceItem = n -1;
-                cart.splice(n, 1, replaceItem)
-            }
-        }
-        cart.find(findDuplicatedItem)
-        
-        findDuplicatedItem();
-        console.log();                     */
-                 
         let cartItemArticle = document.createElement('div')
-        cartItemArticle.innerHTML = //LOOP cart.map((priduct)=>`ALL HTML`)???product.id
+        cartItemArticle.innerHTML = 
             `<article class="cart__item" data-id="${product.id}" data-color="${product.color}">  <!--color incorrect-->
                 <div class="cart__item__img">
                   <img src="${product.imgUrl}" alt="${product.altTxt}">
@@ -60,16 +159,20 @@ ligne dans le tableau
                     </div>
                   </div>
                 </div>
-              </article> `  //in span, there was ${product.price}
+              </article> `  
 
         document.getElementById('cart__items').appendChild(cartItemArticle); 
     } 
+// recuperer et affichier les prix 
     await getPrice();
 };
-cartItemArt();
 
-//creer la requete GET pour recuperer les info du produit 
-//async 
+
+/****************************** FIN : creer des articles pour les produits selectionnes du cart *****************************/
+
+
+
+/********************** creer la requete GET pour recuperer les prix du produit et les affichier ***********************/
 function getPrice(){
     fetch('http://localhost:3000/api/products',{
         method: 'GET',      
@@ -83,7 +186,8 @@ function getPrice(){
         return response.json();
         }
     })    
-    .then(function(products){  //le parametre entre() est le resultat de l'appel API = products info
+// recuperer les prix du produits seletionnes dans tout les produits
+    .then(function(products){  
         for (let product of products) {
             let elements = document.querySelectorAll(`[data-id="${product._id}"]`);
             for (let element of elements){
@@ -91,33 +195,18 @@ function getPrice(){
                 productPrice.textContent = product.price;
             }
         }
+// counter la quantite totale et le prix total et les affichier
         showTotalQuantitynPrice();
-        /*        let itemsPrice = document.querySelectorAll('.productPrice');
-        console.log(itemsPrice);
-        for (let i in itemsPrice){
-            let itemPrice = itemsPrice[i].closest('article');
-            let itemId = itemPrice.dataset.id; 
-            console.log("itemId(data-id of article) is"+ itemId);  
-
-                for (let product of products){
-                    if(product._id == itemId){
-                        console.log(product.price);
-                        itemsPrice[i].textContent = product.price;
-                        break;
-                    }
-                }
-        }       */
     })
     .catch(function(err){
-        console.log(err)
-    
+        console.log(err)   
     });
 }
+/********************** FIN : creer la requete GET pour recuperer les prix du produit et les affichier ***********************/
 
-//Counter la quantite totale et le prix total
-//async 
+/********************************** counter la quantite totale et le prix total **********************************************/
 function showTotalQuantitynPrice(){
-   // await cartItemArt();  --> 2 articles become 4 -o-  
+    
     let totalQuantity = 0; 
     let totalPrice =0;
     let products =  document.querySelectorAll('article');
@@ -126,212 +215,24 @@ function showTotalQuantitynPrice(){
         let productPrice = product.querySelector('.productPrice').textContent;
         let productQuantity = product.querySelector('.itemQuantity').value;
         
-        totalQuantity += parseInt(productQuantity);        ///on peut laisser la numero bizzare 1* ?
+        totalQuantity += parseInt(productQuantity);        
         totalPrice += parseInt(productQuantity) * parseFloat(productPrice);  
-        console.log("The totalQuantity in cart is "+ totalQuantity, "The total price in cart is "+ totalPrice);
         }
     document.getElementById('totalQuantity').textContent = totalQuantity; 
     document.getElementById('totalPrice').textContent = totalPrice;
 }
-//showTotalQuantitynPrice();
 
-//Changement de quantite du produit
-
-    const itemsQuantity = document.querySelectorAll('.itemQuantity');
-
-    for (let i = 0; i < itemsQuantity.length; i++){//(let i in itemsQuantity){
-    itemsQuantity[i].addEventListener('change', function(){  //'change'OR 'input' to see the change everytime
-        let itemToBeModified = itemsQuantity[i].closest('article');
-        let itemId = itemToBeModified.dataset.id;
-        let colorChosen = itemToBeModified.dataset.color;
-        
-        for (let product of cart){       
-            if(product.id == itemId && product.color == colorChosen){ 
-                //cart[1] = this.value;
-                product.quantity = parseInt(this.value);
-                
-            } 
-        }
-        //how can i get the quantity of input?????  https://www.javascripttutorial.net/javascript-dom/javascript-change-event/
-        
-            localStorage.setItem('cart', JSON.stringify(cart));
-            console.log(cart);
-            //calculate total quantity again
-            showTotalQuantitynPrice();
-});
-    }
-
-
-    //.find or .indexOf https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf
-    //OR .splice https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/Array/splice
-
-
-//effacement d'un produit
-const itemsDelete = document.querySelectorAll('.deleteItem');
-
-for (let i = 0; i < itemsQuantity.length; i++){//(let i in itemsDelete){
-    itemsDelete[i].addEventListener('click', function(){ //p .deleteItem
-        let itemToBeDeleted = itemsDelete[i].closest('article');  //element.closest() ->target the element to change
-        let itemId = itemToBeDeleted.dataset.id;
-        let colorChosen = itemToBeDeleted.dataset.color;
-    
-        cart = cart.filter(function(product){
-            if(itemId == product.id && colorChosen == product.color){
-                return false;
-            }
-            return true;
-        })
-        let el = document.querySelector(`[data-id="${itemId}"][data-color="${colorChosen}"]`);
-        el.remove(); //->remove always the first product on DOM but localstorage is ok...
-        
-        
-    
-        localStorage.setItem('cart', JSON.stringify(cart));
-        console.log(cart);
-        
-        showTotalQuantitynPrice();
-    //localStorage.removeItem(itemToBeDeleted);  //localStorage.clear(); ->all delete localStorage.removeItem('cart') .find ->trouver les items
-    });
-}
-/*   
-    let itemToBeDeleted = [];
-    itemToBeDeleted = localStorage.getItem('cart', cart[0] == itemID && cart[2] == colorChosen); /*?????
-            <-article which contains specific id n color / [] in cart which contains the id n color
-            [] includes 'itemID == a && colorChosen == b' How can i take a specific element with condition? */
-/*    let itemToBeDeletedArticle = ;
-    var closestDeletebtn = itemToBeDeletedArticle.closest('input .deleteItem'); //delete button /p .deleteItem
-    if(closestDeletebtn !== null){
-        closestDeletebtn.addEventListener('click', function(){
-            localStorage.removeItem(itemToBeDeleted); //delete specific item from the cart
-        });
-    } else {
-        console.log('delete button is null');
-    }
-    */
+/********************************** FIN : counter la quantite totale et le prix total *******************************************/
 
 
 
-/* Regex varifier    https://www.pierre-giraud.com/javascript-apprendre-coder-cours/regex-recherche-remplacement/
-let a = /[a-zA-Z]/g;    ----> g : global if there are more than 2 matches by string.match(a), with g they show 2 of them
-let b = new RegExp('[a-zA-Z]','g');  it is boolean so if there is no match, they return false 
-*/
-let checkName = /^[a-zA-Z -]{2,}$/g;
-let checkFamilyName = /^[a-zA-Z -]{2,}$/g;
-let checkAddress = /^[\w. -]+$/g; // ^[A-Za-z0-9_.]+$   ^[\w.]+ ->azAZ09_ included []? )? ->can be with ) + ou {1,}/ * ou {0,}
-let checkCity = /^[a-zA-Z -]{2,}$/g;
-let checkEmail = /^[\w. -]+@[\w. -]+\.[\w]{2,3}$/g;    
-//https://stackabuse.com/validate-email-addresses-with-regular-expressions-in-javascript/
-//  let regex = new RegExp("([!#-'*+/-9=?A-Z^-~-]+(\.[!#-'*+/-9=?A-Z^-~-]+)*|\"\(\[\]!#-[^-~ \t]|(\\[\t -~]))+\")@([!#-'*+/-9=?A-Z^-~-]+(\.[!#-'*+/-9=?A-Z^-~-]+)*|\[[\t -Z^-~]*])");
-
-/*let formCheckList = [checkName, checkAddress, checkAddress, checkCity, checkEmail];
-let champ = ['#firstName', '#lastName','#address', '#city', '#email'];
-let errMsgId = ['firstNameErrorMsg', 'lastNameErrorMsg', 'addressErrorMsg', 'cityErrorMsg', 'emailErrorMsg'];
-let errMsgName = ["Le prénom", "Le nom", "L'adresse", "Le nom de la ville", "L'adresse Email"];
-let errMsgReason = ["des caractères et '-'.", "des caractères et '-'.", "des caractères, des nombres et des caractères speciales '-', '.' et espace.",
- "des caractères et '-'.", "les types d'e-mails. Ecrivez comme abc@xxx.xx"];
-
-let champs = document.querySelectorAll('.cart__order__form__question').closest(input);
-//let champs = document.querySelector(champ);
-champs.forEach(element => {
-    element.addEventListener('input', function(event){
-
-    });
-});
-
-*/
-/*
-//for(let i in ?????????){
-document.querySelector('#firstName').addEventListener('input', function(event){
-//document.querySelector(champ[i]).addEventListener('input', function(event){
-    let value = event.target.value;
-    if(value.match(checkName) == false){  // boolean false = null = form is invalid .MATCH OR .TEST
-    //if(formCheckList[i].match(value) == false){     
-        document.getElementById('firstNameErrorMsg').innerHTML = "Le prénom est invalide. Ce champ n'accepte que des caractères.";
-    } else {
-        console.log('Prénom valide')
-    }
-});*/
-//}
-
-document.querySelector('#order').addEventListener('click', function(event){
-    event.preventDefault();
-
-    // vérifier les champs avec les regex
-    // faire une isOK = true
-    // a chaque vérification, si il y a une erreur, mettre isOK = false
-    const champs = [
-        {champId : "#firstName", regex : checkName, errMsgId : "firstNameErrorMsg", errMsgName : "Le prénom", errMsgReason : "des caractères et '-'.", locoName : "firstName"},
-        {champId : "#lastName", regex : checkFamilyName, errMsgId : "lastNameErrorMsg", errMsgName : "Le nom", errMsgReason : "des caractères et '-'.", locoName : "lastName"},
-        {champId : "#address", regex : checkAddress, errMsgId : "addressErrorMsg", errMsgName : "L'adresse", errMsgReason : "des caractères, des nombres et des caractères speciales '-', '.' et espace." , locoName : "address"},
-        {champId : "#city", regex : checkCity, errMsgId : "cityErrorMsg", errMsgName : "Le nom de la ville", errMsgReason : "des caractères et '-'." , locoName : "city"},
-        {champId : "#email", regex : checkEmail, errMsgId : "emailErrorMsg", errMsgName : "L'adresse Email", errMsgReason : "les types d'e-mails. Ecrivez comme abc@xxx.xx" , locoName : "email"}]; 
-  //  let isOk = false;
-
-  //  let form = JSON.parse(sessionStorage.getItem('form'));
-  //  sessionStorage.clear();
-    let form = [];
-  //  if(form){                                                      2eme tour , ca rutourne false pour true
-            for (let element of champs){
-                let value = document.querySelector(element.champId).value;
-                if(value.match(element.regex)){  
-             //       isOk = true;
-                    console.log(element.champId + " : "+ value +" is valid");
-                    form.push({[element.locoName] : 'true' });
-                    document.getElementById(element.errMsgId).textContent = null; //not to show any msg
-                } else {
-              //      isOk = false;
-                    console.log(""+ value +" exsists but doesn't much our regex");
-                    document.getElementById(element.errMsgId)
-                        .textContent = element.errMsgName + " est invalide. Ce champ n'accepte que " + element.errMsgReason;
-                    form.push({[element.locoName]: 'false'}); //to show false as false
-                    }
-            }
-   // } 
-
-    try{
-       // localStorage.clear();
-       sessionStorage.setItem('form', JSON.stringify(form));
-        } catch(err){    //en cas d'espace manqué sur localstorage
-            console.log(err)
-        }
-        console.log(form);
-/*Marche pas    champs.forEach(element => {
-        let value = document.querySelector(element.champId).value;
-        console.log("The value is: "+ value +", the regex for this value is: "+ element.regex );
-        if(element.regex.test(value)){  //        if(value.match(element.regex) == true){
-            isOk = true;
-            console.log(element.champId + " : "+ value +"is valid");
-        } else {
-            isOk = false;
-            console.log(""+ value +" exsists but doesn't much our regex");
-            document.getElementById(element.errMsgId)
-                .textContent = element.errMsgName + " est invalide. Ce champ n'accepte que " + element.errMsgReason;
-        }    
-    });*/
-
-    // si isOK est true alors on envoie le formulaire
-    
-    const formValidation = [{firstName : 'true'}, {lastName: 'true'}, {address: 'true'}, {city: 'true'}, {email: 'true'}];
-   // let result = (form.length === formValidation.length) && (formValidation.every(champ => form.includes(champ)));   NE MARCHE PAS
-    let result = JSON.stringify(form.concat().sort()) === JSON.stringify(formValidation.concat().sort()); //https://the-zombis.sakurane.jp/wp/blog/2019/11/24/post-4114/ web.fla check js arrays are the same or not.
-
-    if (result){   //All of input are valid = function 'sendForminfo' 
-        sendForminfo();
-        console.log("form is sent");
-    } else {        
-        alert("form has not sent.");
-    }
-});  
-
- //etape 10 valider la commande -->local storage? here , its for etape11 POST request to show orderId in confirmation
-//passer une commande ,  La requête post ne prend pas encore en considération la quantité ni la couleur des produits achetés.
-//async 
+/********************************** passer une commande avec la requete POST ********************************************************/ 
 function sendForminfo(){
     let productIds = [];
     for (let product of cart){
         productIds.push(product.id);
     }
-    let newOrder =  //peut-etre ce n'est pas la bon structure...back>controllers>productjs line 49-56
+    let newOrder =  
     {
         contact: {
             firstName : document.getElementById('firstName').value, 
@@ -351,56 +252,59 @@ function sendForminfo(){
             'Accept': 'application/json',
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(newOrder) //donee qu on souhaite envoyer(jsonBody)({value: document.getElementById('').value})POSTで返された値をどこに置くか 
+        body: JSON.stringify(newOrder) //donee qu on souhaite envoyer(jsonBody)
     })
-        .then(function(response){
-            if(response.ok){        
-                return response.json();
-            }
-        }) 
-        
-        .then(function(value){  //send the info of formula
-            console.log(value);
-            let orderId = value.orderId;
-            let confirmationUrl = 'confirmation.html?orderId=' + orderId;
-            let form = document.querySelector('form');
-            form.setAttribute('method', 'post');
-            form.setAttribute('action', confirmationUrl)
-            form.submit();         
-            //document.forms["myform"].submit();    .target-> send the result to the place you wanna put    .method -> show the method you use for sending the form 
-
-            sendOrderId(orderId);
-        })
-        .catch(function(err){
-            console.log(err)
-        });   
+    .then(function(response){
+        if(response.ok){        
+            return response.json();
+        }
+    }) 
+    .then(function(value){  
+        console.log(value);
+        let orderId = value.orderId;
+        let form = document.querySelector('form');
+        form.setAttribute('method', 'post');
+        form.setAttribute('action', 'confirmation.html?orderId=' + orderId)
+        form.submit();         
+        //document.forms["myform"].submit();    .target-> send the result to the place you wanna put    .method -> show the method you use for sending the form 
+    })
+    .catch(function(err){
+        console.log(err)
+    });   
 }
+
+/********************************** FIN : passer une commande avec la requete POST ********************************************************/ 
 
 
 
 /*etape11   take the command ID by POST request 
             affichier le numero de command sur confirmation.html (addEventlistener - innerHtML )
-    */
-//let confirmationUrl = 'confirmation.html?orderId=' + orderId;
+    
 
-function sendOrderId(orderId){
-    fetch ('confirmation.html?orderId=' + orderId , {
-        method: 'POST',
+
+function sendOrderId(value){
+  //  fetch ('confirmation.html?orderId=' + orderId , {  //here s a problem...405 method not allowed
+    fetch ('confirmation.html?orderId=' + value , {
+        method: 'GET',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: ({value: document.querySelector('span #orderId').value})
+        body: JSON.stringify(jsonBody) //donee qu on souhaite envoyer(jsonBody)({value: document.getElementById('').value})POSTで返された値をどこに置くか 
     })
     .then(function(response){
         if(response.ok){
             return response.json()
         }
     })
+    .then(function(){
+        let orderId = JSON.parse(jsonBody);
+        document.getElementById('orderId').textContent = orderId;
+    })
     .catch(function(err){
         console.log(err);
     });
 }
-
+*/
 
 /*QUESTIONS
     
