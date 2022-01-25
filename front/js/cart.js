@@ -267,23 +267,23 @@ document.querySelector('#order').addEventListener('click', function(event){
         {champId : "#email", regex : checkEmail, errMsgId : "emailErrorMsg", errMsgName : "L'adresse Email", errMsgReason : "les types d'e-mails. Ecrivez comme abc@xxx.xx" , locoName : "email"}]; 
   //  let isOk = false;
 
-    let form = JSON.parse(sessionStorage.getItem('form'));
-    sessionStorage.clear();
-    form = [];
+  //  let form = JSON.parse(sessionStorage.getItem('form'));
+  //  sessionStorage.clear();
+    let form = [];
   //  if(form){                                                      2eme tour , ca rutourne false pour true
             for (let element of champs){
-               // console.log(element.champId);
                 let value = document.querySelector(element.champId).value;
-                if(element.regex.test(value)){  
+                if(value.match(element.regex)){  
              //       isOk = true;
                     console.log(element.champId + " : "+ value +" is valid");
                     form.push({[element.locoName] : 'true' });
+                    document.getElementById(element.errMsgId).textContent = null; //not to show any msg
                 } else {
               //      isOk = false;
                     console.log(""+ value +" exsists but doesn't much our regex");
                     document.getElementById(element.errMsgId)
                         .textContent = element.errMsgName + " est invalide. Ce champ n'accepte que " + element.errMsgReason;
-                    form;
+                    form.push({[element.locoName]: 'false'}); //to show false as false
                     }
             }
    // } 
@@ -327,15 +327,23 @@ document.querySelector('#order').addEventListener('click', function(event){
 //passer une commande ,  La requête post ne prend pas encore en considération la quantité ni la couleur des produits achetés.
 //async 
 function sendForminfo(){
+    let productIds = [];
+    for (let product of cart){
+        productIds.push(product.id);
+    }
     let newOrder =  //peut-etre ce n'est pas la bon structure...back>controllers>productjs line 49-56
-                [{firstName : document.getElementById('firstName').value}, 
-                {lastName: document.getElementById('lastName').value}, 
-                {address: document.getElementById('address').value}, 
-                {city: document.getElementById('city').value}, 
-                {email: document.getElementById('email').value},
-                cart];
+    {
+        contact: {
+            firstName : document.getElementById('firstName').value, 
+            lastName: document.getElementById('lastName').value, 
+            address: document.getElementById('address').value, 
+            city: document.getElementById('city').value, 
+            email: document.getElementById('email').value
+        },
+        products: productIds
+    };
     console.log(newOrder);
-    let url = 'http://localhost:3000/api/products/order'; // 400 bad request????  
+    let url = 'http://localhost:3000/api/products/order';   
     //await 
     fetch(url, {    
         method: 'POST',
@@ -345,58 +353,57 @@ function sendForminfo(){
         },
         body: JSON.stringify(newOrder) //donee qu on souhaite envoyer(jsonBody)({value: document.getElementById('').value})POSTで返された値をどこに置くか 
     })
-      /*  .then(async function(response){
-            try{
-                console.log(response);
-                const content = await response.json();
-                let contentObjecct = JSON.stringify(content);
-                console.log(contentObjecct);
-            } catch(err){
-                console.log(err);
-            }
-        })  */
         .then(function(response){
-            if(response.ok){
-                console.log(response.json());
-                let res = JSON.stringify(response.json());
-                console.log("response.json is : "+ res);
-
+            if(response.ok){        
                 return response.json();
             }
         }) 
         
         .then(function(value){  //send the info of formula
-            console.log(value.orderId);
-          //  let orderId= JSON.parse(orderIdCustomerInfo);
-     //       console.log(newOrder);  //orderId???  How can I get???? by postData.text?
-         
-        //    document.querySelector(form .cart__order__form).setAttribute('action','confirmation.html');
-            let urlConfirmation =  'http://localhost:3000/api/products/'; 
-            document.querySelector(form .cart__order__form)
-                .action = urlConfirmation + orderId;                  //which url? this page(document.location.search)? 'http://localhost:3000/api/products/' ?
-        /*    document.querySelector(form .cart__order__form)
-                .method = "POST";  
-            document.querySelector(form .cart__order__form)
-                .submit();*/
-            //document.forms["myform"].submit();    .target-> send the result to the place you wanna put    .method -> show the method you use for sending the form
-            document.getElementById('orderId').innerText = value.postData.text;
- 
+            console.log(value);
+            let orderId = value.orderId;
+            let confirmationUrl = 'confirmation.html?orderId=' + orderId;
+            let form = document.querySelector('form');
+            form.setAttribute('method', 'post');
+            form.setAttribute('action', confirmationUrl)
+            form.submit();         
+            //document.forms["myform"].submit();    .target-> send the result to the place you wanna put    .method -> show the method you use for sending the form 
+
+            sendOrderId(orderId);
         })
         .catch(function(err){
             console.log(err)
         });   
 }
-//document.querySelector('#order').addEventListener('click', sendForminfo);
+
 
 
 /*etape11   take the command ID by POST request 
             affichier le numero de command sur confirmation.html (addEventlistener - innerHtML )
     */
+//let confirmationUrl = 'confirmation.html?orderId=' + orderId;
+
+function sendOrderId(orderId){
+    fetch ('confirmation.html?orderId=' + orderId , {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: ({value: document.querySelector('span #orderId').value})
+    })
+    .then(function(response){
+        if(response.ok){
+            return response.json()
+        }
+    })
+    .catch(function(err){
+        console.log(err);
+    });
+}
+
 
 /*QUESTIONS
     
-
-
     line134: const orderIdInJson = JSON.parse(jsonBody);
             console.log(JSON.stringify(jsonBody));  //orderId???  How can I get????
             console.log(orderIdInJson);
