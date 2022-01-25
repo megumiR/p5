@@ -2,6 +2,7 @@ let search_params = new URLSearchParams(document.location.search); //document.lo
 let orderId = search_params.get('orderId');
 let cart = JSON.parse(localStorage.getItem('cart'));
 
+// s'il y a l'orderId, affichier sur la page confirmation. si non, on passe des for boucles, eventListener et les functions pour la page panier 
 if (orderId) {
     document.getElementById('orderId').innerText = orderId;
 } else {
@@ -64,7 +65,7 @@ document.querySelector('#order').addEventListener('click', function(event){
     event.preventDefault();
     let checkName = /^[a-zA-Z -]{2,}$/g;
     let checkFamilyName = /^[a-zA-Z -]{2,}$/g;
-    let checkAddress = /^[\w. -]+$/g; // ^[A-Za-z0-9_.]+$   ^[\w.]+ ->azAZ09_ included []? )? ->can be with ) + ou {1,}/ * ou {0,}
+    let checkAddress = /^[\w. -]+$/g; 
     let checkCity = /^[a-zA-Z -]{2,}$/g;
     let checkEmail = /^[\w. -]+@[\w. -]+\.[\w]{2,3}$/g;  
     const champs = [
@@ -114,7 +115,7 @@ document.querySelector('#order').addEventListener('click', function(event){
 
 
 
-
+// Des functions utilisés /////////////////////////////////////////////////////////////////
 
 /*************************** recuperer l'array via localstorage **************************/
 // verifier s'il est null avant JSON.parse 
@@ -123,7 +124,7 @@ function takeItemInLocalStorage(){
         cart = JSON.parse(localStorage.getItem('cart'));
         console.log(cart);
     } else{
-        console.log(err);
+        console.log('err');
     }
 }
 
@@ -135,7 +136,8 @@ async function cartItemArt(){
 // recuperer l'info du panier     
     takeItemInLocalStorage();
     
-// affichier tout les produits du panier    
+// affichier tout les produits du panier  
+if(cart !== null){  
     for (let product of cart){
         let cartItemArticle = document.createElement('div')
         cartItemArticle.innerHTML = 
@@ -165,6 +167,7 @@ async function cartItemArt(){
     } 
 // recuperer et affichier les prix 
     await getPrice();
+}
 };
 
 
@@ -274,48 +277,3 @@ function sendForminfo(){
 }
 
 /********************************** FIN : passer une commande avec la requete POST ********************************************************/ 
-
-
-
-/*etape11   take the command ID by POST request 
-            affichier le numero de command sur confirmation.html (addEventlistener - innerHtML )
-    
-
-
-function sendOrderId(value){
-  //  fetch ('confirmation.html?orderId=' + orderId , {  //here s a problem...405 method not allowed
-    fetch ('confirmation.html?orderId=' + value , {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(jsonBody) //donee qu on souhaite envoyer(jsonBody)({value: document.getElementById('').value})POSTで返された値をどこに置くか 
-    })
-    .then(function(response){
-        if(response.ok){
-            return response.json()
-        }
-    })
-    .then(function(){
-        let orderId = JSON.parse(jsonBody);
-        document.getElementById('orderId').textContent = orderId;
-    })
-    .catch(function(err){
-        console.log(err);
-    });
-}
-*/
-
-/*QUESTIONS
-    
-    line134: const orderIdInJson = JSON.parse(jsonBody);
-            console.log(JSON.stringify(jsonBody));  //orderId???  How can I get????
-            console.log(orderIdInJson);
-    
-
-    line208: i dont  know what i should put in if()
-
-
-    CSS selector: https://developer.mozilla.org/fr/docs/Web/CSS/Attribute_selectors
-    to submit formkkk : https://developer.mozilla.org/fr/docs/Web/API/HTMLFormElement/submit
-    */
